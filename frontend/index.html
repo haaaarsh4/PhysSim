@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Physics Workbench</title>
+<!-- Tab only, on purpose. No apple-touch-icon, no manifest, nothing on the
+     page itself: the mark belongs to the browser's title bar and nowhere else. -->
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<script>
+/* The route is decided here, in <head>, before the body has been parsed and
+   therefore before the browser can paint it. Without this the homepage is in
+   the markup un-hidden, so a refresh on /dynamics shows a frame of the
+   homepage before home.js (a deferred module, fetched over the network) gets
+   a chance to hide it. Classic scripts in <head> block rendering; home.js
+   keeps this class in step from then on. */
+if (/\/(dynamics|thermo|mech)\/?$/.test(location.pathname)) {
+  document.documentElement.classList.add('route-workbench');
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<!-- ============================== HOMEPAGE ============================== -->
+<div id="home" class="home">
+  <nav class="home-nav">
+    <span class="home-wordmark">Physics<b>Workbench</b></span>
+  </nav>
+
+  <div class="home-hero">
+    <div class="home-hero-copy">
+      <h1 class="home-headline"><span class="accent">Real</span> physics<br>in your browser.</h1>
+      <button class="home-cta" id="tryItBtn">Try it</button>
+      <div class="home-foot">
+        <div class="home-eyebrow">Workbench</div>
+        <p class="home-desc">A rigid-body engine and a kinetic gas, both real, both playable. No install, no account.</p>
+      </div>
+    </div>
+
+    <div class="home-hero-visual" aria-hidden="true">
+      <div class="tube-stage">
+        <!-- The channel, painted to the canvas by tube.js: a half torus whose
+             two mouths are cut flat on the bend's centre line, shaded across
+             its wall exactly as the reference is. The seam runs through the
+             bend's centre, frosting whatever is on its left. -->
+        <canvas class="tube-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== TOPIC PICKER ============================== -->
+<!-- A sheet of the page's own light with four rows on it: same palette, same
+     type, one accent, and no per-topic colour anywhere. -->
+<div class="modal-backdrop" id="topicModal">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Choose a topic">
+
+    <div class="topic-head">
+      <div>
+        <div class="topic-eyebrow">Workbench</div>
+        <p class="topic-sub">Dynamics, Thermo and Vibrations are live. The rest are on the way.</p>
+      </div>
+      <button class="icon-btn-light" id="closeModalBtn" aria-label="Close" data-icon="X"></button>
+    </div>
+
+    <div class="topic-list">
+      <button class="topic-row" data-topic="dynamics" style="--i:0">
+        <span class="topic-index">01</span>
+        <span class="topic-body">
+          <span class="topic-name">Dynamics</span>
+          <span class="topic-desc">Gravity, collisions, momentum: a real rigid-body engine.</span>
+        </span>
+        <span class="topic-go" data-icon="ArrowRight"></span>
+      </button>
+
+      <button class="topic-row" data-topic="kinematics" style="--i:1" disabled>
+        <span class="topic-index">02</span>
+        <span class="topic-body">
+          <span class="topic-name">Kinematics</span>
+          <span class="topic-desc">Position, velocity, and acceleration in motion.</span>
+        </span>
+        <span class="topic-soon">Soon</span>
+      </button>
+
+      <button class="topic-row" data-topic="thermo" style="--i:2">
+        <span class="topic-index">03</span>
+        <span class="topic-body">
+          <span class="topic-name">Thermo</span>
+          <span class="topic-desc">Kinetic theory: a gas in a box, heat, work, and the laws they make.</span>
+        </span>
+        <span class="topic-go" data-icon="ArrowRight"></span>
+      </button>
+
+      <button class="topic-row" data-topic="mech" style="--i:3">
+        <span class="topic-index">04</span>
+        <span class="topic-body">
+          <span class="topic-name">Vibrations</span>
+          <span class="topic-desc">Masses, springs and dashpots: modes, poles, and the transfer function between them.</span>
+        </span>
+        <span class="topic-go" data-icon="ArrowRight"></span>
+      </button>
+
+      <button class="topic-row" data-topic="waves" style="--i:4" disabled>
+        <span class="topic-index">05</span>
+        <span class="topic-body">
+          <span class="topic-name">Waves</span>
+          <span class="topic-desc">Oscillation, interference, and resonance.</span>
+        </span>
+        <span class="topic-soon">Soon</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================== WORKBENCH APP ============================== -->
+<div id="app" class="app-shell" hidden>
+
+  <div class="titlebar">
+    <div class="brand">
+      <button class="icon-btn" id="backHomeBtn" title="Back to home" aria-label="Back to home" data-icon="ArrowLeft"></button>
+      <span class="name">Dynamics <b>Workbench</b></span>
+    </div>
+
+    <div class="view-toggle" id="viewToggle" role="group" aria-label="View mode">
+      <button class="on" data-mode="3d" aria-label="3D view" data-icon="Box"><span>3D</span></button>
+      <button data-mode="2d" aria-label="2D view" data-icon="Square"><span>2D</span></button>
+    </div>
+
+    <div class="title-actions">
+      <button class="icon-btn" id="saveBtn" title="Save checkpoint (.json)" aria-label="Save checkpoint" data-icon="Download"></button>
+      <button class="icon-btn" id="loadBtn" title="Load checkpoint (.json)" aria-label="Load checkpoint" data-icon="Upload"></button>
+      <!-- Restart takes a run back to its beginning: the scene exactly as it was
+           built, the clock at zero. Clear is the button that throws the scene
+           away, so it wears a different icon - an eraser rather than an arrow,
+           because those two are the pair a student reaches for mid-experiment
+           and they must not look alike. -->
+      <button class="icon-btn" id="resetBtn" title="Clear the scene" aria-label="Clear the scene" data-icon="Eraser"></button>
+      <button class="icon-btn" id="restartBtn" title="Restart the run (back to the scene as it was built)" aria-label="Restart the run" data-icon="RotateCcw"></button>
+      <button class="icon-btn" id="stepBtn" title="Step one frame (pauses first)" aria-label="Step one frame" data-icon="StepForward"></button>
+      <!-- Marked up in the state the app actually boots in (paused), not the
+           state it most often sits in: the shell is on screen for a frame or
+           two before main.js has run, and a Pause button over a running lamp
+           during that window is a lie the user can catch. -->
+      <button class="run-btn paused" id="runBtn">
+        <span class="run-btn-icon" data-icon="Play"></span>
+        <span class="run-btn-label">Run</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="console">
+
+    <!-- LEFT: SCENE + PHYSICS controls -->
+    <div class="rail left" id="leftRail"></div>
+
+    <!-- CENTER: VIEWPORT -->
+    <div class="viewport" id="viewport">
+      <canvas id="glcanvas" aria-label="3D physics scene. Drag to orbit and scroll to zoom. Drag objects to move them; control-click to add to the selection."></canvas>
+      <!-- Building the scene on the left, running an experiment on the right:
+           the two launchers are the only things up here, one at each corner. -->
+      <div class="viewport-controls">
+        <div class="shape-launcher" id="shapeLauncher">
+          <button class="stage-pill shape-launcher-trigger" id="shapeLauncherToggle" type="button"
+            aria-label="Show shape choices" aria-expanded="false" aria-controls="shapePicker">
+            <span data-icon="Shapes"></span><span>Shapes</span>
+          </button>
+          <div class="shape-picker" id="shapePicker" role="group" aria-label="Add a shape" aria-hidden="true"></div>
+        </div>
+        <!-- The right corner is a column: the lab bench, and under it the two
+             buttons that do to the camera what a wheel and a pinch already do.
+             They are deliberately not a third pill in the top row - that row is
+             two launchers and nothing else. -->
+        <div class="stage-corner">
+          <!-- The lab bench: nine ready experiments. It sits opposite the shapes
+               because choosing what to measure comes before building it. -->
+          <div class="lab-launcher" id="labLauncher">
+            <button class="stage-pill lab-launcher-trigger" id="labLauncherToggle" type="button"
+              aria-label="Show the lab bench" aria-expanded="false" aria-controls="labPicker">
+              <span data-icon="FlaskConical"></span><span>Labs</span>
+            </button>
+            <div class="lab-picker" id="labPicker" role="group" aria-label="Lab bench" aria-hidden="true"></div>
+          </div>
+          <div class="stage-zoom" role="group" aria-label="Zoom the stage">
+            <button class="stage-zoom-btn" type="button" data-zoom="in" aria-label="Zoom in" data-icon="Plus"></button>
+            <button class="stage-zoom-btn" type="button" data-zoom="out" aria-label="Zoom out" data-icon="Minus"></button>
+          </div>
+        </div>
+      </div>
+      <!-- The bench came back from a previous visit. Said out loud, with the way
+           out beside it: a stage that has quietly filled itself with someone's
+           half-finished experiment is more confusing than an empty one, and the
+           one gesture that must never be silent is the app keeping work. -->
+      <div class="session-note is-hidden" id="sessionNote" role="status">
+        <span>Restored the scene from your last visit.</span>
+        <button type="button" class="session-note-btn" id="sessionDiscardBtn">Start fresh</button>
+        <button type="button" class="session-note-close" id="sessionNoteClose" aria-label="Dismiss" data-icon="X"></button>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS / INSPECTOR -->
+    <div class="rail right" id="rightRail"></div>
+
+  </div>
+
+  <!-- PAGE TABS - every page is an independent, savable scene -->
+  <div class="pagebar" id="pagebar">
+    <div class="pagebar-tabs" id="pagebarTabs"></div>
+    <button class="pagebar-add" id="addPageBtn" title="Add page" aria-label="Add page" data-icon="Plus"></button>
+  </div>
+
+  <div class="statusbar">
+    <div style="display:flex;align-items:center;gap:6px;"><span class="dot" id="statusDot"></span><span id="statusText">paused</span></div>
+    <div>Frame  <b id="sbFrame">0</b></div>
+    <div>Time  <b id="sbTime">0.00s</b></div>
+    <div>Runtime  <b id="sbRuntime">0.00ms</b></div>
+    <div class="flex1"></div>
+    <div id="sbBalls">0 balls</div>
+  </div>
+
+</div>
+
+<!-- ============================== THERMO APP ============================== -->
+<!-- The same shell as the Dynamics workbench, down to the classes: one title
+     bar with a wordmark and a 3D/2D switch, two rails, a stage, a page bar and a
+     status bar. What changes is what the rails are built into (frontend/
+     thermo_ui.js) and what the stage holds - a box of molecules rather than a
+     bench of shapes. -->
+<div id="thermo" class="app-shell" hidden>
+
+  <div class="titlebar">
+    <div class="brand">
+      <button class="icon-btn" id="thermoBackHomeBtn" title="Back to home" aria-label="Back to home" data-icon="ArrowLeft"></button>
+      <span class="name">Thermo <b>Workbench</b></span>
+    </div>
+
+    <div class="view-toggle" id="thermoViewToggle" role="group" aria-label="View mode">
+      <button class="on" data-mode="3d" aria-label="3D view" data-icon="Box"><span>3D</span></button>
+      <button data-mode="2d" aria-label="2D view" data-icon="Square"><span>2D</span></button>
+    </div>
+
+    <div class="title-actions">
+      <button class="icon-btn" id="thermoSaveBtn" title="Save checkpoint (.json)" aria-label="Save checkpoint" data-icon="Download"></button>
+      <button class="icon-btn" id="thermoLoadBtn" title="Load checkpoint (.json)" aria-label="Load checkpoint" data-icon="Upload"></button>
+      <button class="icon-btn" id="thermoResetBtn" title="Clear the experiment" aria-label="Clear the experiment" data-icon="Eraser"></button>
+      <button class="icon-btn" id="thermoRestartBtn" title="Restart the run (back to the box as the experiment was set up)" aria-label="Restart the run" data-icon="RotateCcw"></button>
+      <button class="icon-btn" id="thermoStepBtn" title="Step one frame (pauses first)" aria-label="Step one frame" data-icon="StepForward"></button>
+      <!-- Marked up paused, the state the workbench actually boots in. -->
+      <button class="run-btn paused" id="thermoRunBtn">
+        <span class="run-btn-icon" data-icon="Play"></span>
+        <span class="run-btn-label">Run</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="console">
+
+    <!-- LEFT: THE GAS + THE BOX + THE WALLS + THE TIMELINE -->
+    <div class="rail left" id="thermoLeftRail"></div>
+
+    <!-- CENTER: THE STAGE -->
+    <div class="viewport thermo" id="thermoViewport">
+      <canvas id="thermoCanvas" aria-label="A gas in a box. Drag to orbit and scroll to zoom. Click an instrument to set it up. With the lid held by hand, drag the lid to squeeze the gas."></canvas>
+      <div class="viewport-controls">
+        <!-- Two launchers, the same two corners as the other bench: what to put
+             on the stage on the left, what to measure with on the right. The
+             instruments are the shapes: the same pill, the same strip, the same
+             options, and picking one is also what puts its settings on the
+             right rail. -->
+        <div class="shape-launcher" id="thermoInstrumentLauncher">
+          <button class="stage-pill shape-launcher-trigger" id="thermoInstrumentToggle" type="button"
+            aria-label="Show the instruments" aria-expanded="false" aria-controls="thermoInstrumentPicker">
+            <span data-icon="Wrench"></span><span>Instruments</span>
+          </button>
+          <div class="shape-picker" id="thermoInstrumentPicker" role="group" aria-label="Add an instrument" aria-hidden="true"></div>
+        </div>
+        <!-- The same two corners as the other bench, including the column: the
+             lab bench at the top, the zoom under it. -->
+        <div class="stage-corner">
+          <div class="lab-launcher" id="thermoLabLauncher">
+            <button class="stage-pill lab-launcher-trigger" id="thermoLabLauncherToggle" type="button"
+              aria-label="Show the lab bench" aria-expanded="false" aria-controls="thermoLabPicker">
+              <span data-icon="FlaskConical"></span><span>Labs</span>
+            </button>
+            <div class="lab-picker" id="thermoLabPicker" role="group" aria-label="Lab bench" aria-hidden="true"></div>
+          </div>
+          <div class="stage-zoom" role="group" aria-label="Zoom the stage">
+            <button class="stage-zoom-btn" type="button" data-zoom="in" aria-label="Zoom in" data-icon="Plus"></button>
+            <button class="stage-zoom-btn" type="button" data-zoom="out" aria-label="Zoom out" data-icon="Minus"></button>
+          </div>
+        </div>
+      </div>
+      <div class="session-note is-hidden" id="thermoSessionNote" role="status">
+        <span>Restored the box from your last visit.</span>
+        <button type="button" class="session-note-btn" id="thermoSessionDiscardBtn">Start fresh</button>
+        <button type="button" class="session-note-close" id="thermoSessionNoteClose" aria-label="Dismiss" data-icon="X"></button>
+      </div>
+    </div>
+
+    <!-- RIGHT: WHAT THE GAS IS DOING -->
+    <div class="rail right" id="thermoRightRail"></div>
+
+  </div>
+
+  <div class="pagebar" id="thermoPagebar">
+    <div class="pagebar-tabs" id="thermoPagebarTabs"></div>
+    <button class="pagebar-add" id="thermoAddPageBtn" title="Add page" aria-label="Add page" data-icon="Plus"></button>
+  </div>
+
+  <div class="statusbar">
+    <div style="display:flex;align-items:center;gap:6px;"><span class="dot" id="thermoStatusDot"></span><span id="thermoStatusText">paused</span></div>
+    <div>Step  <b id="thermoSbFrame">0</b></div>
+    <div>Gas time  <b id="thermoSbTime">0 ps</b></div>
+    <div>Runtime  <b id="thermoSbRuntime">0.00ms</b></div>
+    <div class="flex1"></div>
+    <div id="thermoSbMolecules">0 molecules</div>
+  </div>
+
+</div>
+
+<!-- ============================== MECHANICAL VIBRATIONS APP ============================== -->
+<!-- The third shell, and the third time the same shell. Everything above the
+     stage is the other two benches word for word - the wordmark, the 3D/2D
+     switch, save/load/reset/restart/step/run, two rails, a page bar, a status
+     bar - because a student who has learned one bench has learned three.
+
+     What is different is only what a vibrations bench needs. The left corner
+     carries two strips instead of one: the *systems* are this bench's shapes
+     (the classic rigs a textbook draws, chosen before anything is driven) and
+     the *instruments* are the other bench's instruments word for word - a drive
+     to push with, a shake table to move the ground, and a probe to make one mass
+     the output. The right corner is the lab bench, as it is everywhere. -->
+<div id="mech" class="app-shell" hidden>
+
+  <div class="titlebar">
+    <div class="brand">
+      <button class="icon-btn" id="mechBackHomeBtn" title="Back to home" aria-label="Back to home" data-icon="ArrowLeft"></button>
+      <span class="name">Vibrations <b>Workbench</b></span>
+    </div>
+
+    <div class="view-toggle" id="mechViewToggle" role="group" aria-label="View mode">
+      <button class="on" data-mode="3d" aria-label="3D view" data-icon="Box"><span>3D</span></button>
+      <button data-mode="2d" aria-label="2D view" data-icon="Square"><span>2D</span></button>
+    </div>
+
+    <div class="title-actions">
+      <button class="icon-btn" id="mechSaveBtn" title="Save checkpoint (.json)" aria-label="Save checkpoint" data-icon="Download"></button>
+      <button class="icon-btn" id="mechLoadBtn" title="Load checkpoint (.json)" aria-label="Load checkpoint" data-icon="Upload"></button>
+      <button class="icon-btn" id="mechResetBtn" title="Clear the bench (back to one mass)" aria-label="Clear the bench" data-icon="Eraser"></button>
+      <button class="icon-btn" id="mechRestartBtn" title="Restart the run (back to the system as it was built)" aria-label="Restart the run" data-icon="RotateCcw"></button>
+      <button class="icon-btn" id="mechStepBtn" title="Step one frame (pauses first)" aria-label="Step one frame" data-icon="StepForward"></button>
+      <!-- Marked up paused, the state the workbench actually boots in. -->
+      <button class="run-btn paused" id="mechRunBtn">
+        <span class="run-btn-icon" data-icon="Play"></span>
+        <span class="run-btn-label">Run</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="console">
+
+    <!-- LEFT: THE SYSTEM + WHAT DRIVES IT + THE TIMELINE -->
+    <div class="rail left" id="mechLeftRail"></div>
+
+    <!-- CENTER: THE STAGE -->
+    <div class="viewport" id="mechViewport">
+      <canvas id="mechCanvas" aria-label="Masses on springs and dashpots. Drag empty space to orbit and scroll to zoom; drag a block to displace it and let go. Click a spring, a dashpot, an arrow or a probe to set it up."></canvas>
+      <div class="viewport-controls">
+        <!-- The left corner is a column here, because this bench has two strips
+             on it: the systems first - the rig itself, which is what the other
+             bench puts on the stage with Shapes - and the instruments under it,
+             which are the other bench's instruments exactly. It reads downward
+             the way a student works: pick the rig, then pick what drives it. -->
+        <div class="stage-corner left">
+          <div class="shape-launcher" id="mechSystemLauncher">
+            <button class="stage-pill shape-launcher-trigger" id="mechSystemToggle" type="button"
+              aria-label="Show the systems" aria-expanded="false" aria-controls="mechSystemPicker">
+              <span data-icon="Boxes"></span><span>Systems</span>
+            </button>
+            <div class="shape-picker" id="mechSystemPicker" role="group" aria-label="Put a known system on the bench" aria-hidden="true"></div>
+          </div>
+          <div class="shape-launcher" id="mechInstrumentLauncher">
+            <button class="stage-pill shape-launcher-trigger" id="mechInstrumentToggle" type="button"
+              aria-label="Show the instruments" aria-expanded="false" aria-controls="mechInstrumentPicker">
+              <span data-icon="Wrench"></span><span>Instruments</span>
+            </button>
+            <div class="shape-picker" id="mechInstrumentPicker" role="group" aria-label="Add an instrument" aria-hidden="true"></div>
+          </div>
+        </div>
+        <!-- And the right corner is the lab bench over the zoom, the same
+             column, in the same place, as the other two benches. -->
+        <div class="stage-corner">
+          <div class="lab-launcher" id="mechLabLauncher">
+            <button class="stage-pill lab-launcher-trigger" id="mechLabLauncherToggle" type="button"
+              aria-label="Show the lab bench" aria-expanded="false" aria-controls="mechLabPicker">
+              <span data-icon="FlaskConical"></span><span>Labs</span>
+            </button>
+            <div class="lab-picker" id="mechLabPicker" role="group" aria-label="Lab bench" aria-hidden="true"></div>
+          </div>
+          <div class="stage-zoom" role="group" aria-label="Zoom the stage">
+            <button class="stage-zoom-btn" type="button" data-zoom="in" aria-label="Zoom in" data-icon="Plus"></button>
+            <button class="stage-zoom-btn" type="button" data-zoom="out" aria-label="Zoom out" data-icon="Minus"></button>
+          </div>
+        </div>
+      </div>
+      <!-- What the bench has to say about the rig: the parts it is holding that
+           are not holding anything, and - when it is up - the note that says the
+           bench came back from an earlier visit. One column holding both, rather
+           than two notices that each know the corner, because a restored session
+           can very well be holding a loose part and two panels that each position
+           themselves in the same corner land on each other. The bench's own note
+           leads: it is the one with a fix in it. -->
+      <div class="stage-notices">
+        <div class="bench-notes is-hidden" id="mechNotes" role="status" aria-live="polite"></div>
+        <div class="session-note is-hidden" id="mechSessionNote" role="status">
+          <span>Restored the bench from your last visit.</span>
+          <button type="button" class="session-note-btn" id="mechSessionDiscardBtn">Start fresh</button>
+          <button type="button" class="session-note-close" id="mechSessionNoteClose" aria-label="Dismiss" data-icon="X"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: WHAT THE SYSTEM IS DOING -->
+    <div class="rail right" id="mechRightRail"></div>
+
+  </div>
+
+  <div class="pagebar" id="mechPagebar">
+    <div class="pagebar-tabs" id="mechPagebarTabs"></div>
+    <button class="pagebar-add" id="mechAddPageBtn" title="Add page" aria-label="Add page" data-icon="Plus"></button>
+  </div>
+
+  <div class="statusbar">
+    <div style="display:flex;align-items:center;gap:6px;"><span class="dot" id="mechStatusDot"></span><span id="mechStatusText">paused</span></div>
+    <div>Step  <b id="mechSbStep">0</b></div>
+    <div>Time  <b id="mechSbTime">0.000 s</b></div>
+    <div>Runtime  <b id="mechSbRuntime">0.00ms</b></div>
+    <div class="flex1"></div>
+    <div id="mechSbSize">1 mass</div>
+  </div>
+
+</div>
+
+<script type="module" src="./home.js"></script>
+</body>
+</html>

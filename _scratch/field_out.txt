@@ -1,0 +1,93 @@
+anchor sample points: 2549
+skip paste-1790119001070-2237408.png          (no silhouette)
+skip paste-1790121612137-2237408.png          (no silhouette)
+paste-1790121886823-2237408.png           875x560   ring-scale 1.0376  offset (+4.5,+0.0)  fits 259 pts  affine ['0.987/+2.9', '0.997/+0.5', '0.983/+3.8']  residual 0.50 luma
+paste-1790122392406-2237408.png          1888x1235  ring-scale 1.6409  offset (+4.5,-4.5)  fits 179 pts  affine ['0.419/+119.3', '0.449/+112.4', '0.414/+126.2']  residual 8.16 luma
+   dropped: residual too high to be the same design
+paste-1790122430917-2237408.png           924x567   ring-scale 1.0384  offset (+3.0,+0.0)  fits 319 pts  affine ['0.991/+2.1', '1.002/-0.6', '0.988/+2.8']  residual 0.50 luma
+skip paste-1790123347512-2237408.png          (no silhouette)
+paste-1790297599584-2485136.png          3823x1918  ring-scale 1.7134  offset (-4.5,-4.5)  fits 88 pts  affine ['0.422/+116.8', '0.438/+112.7', '0.447/+117.4']  residual 8.22 luma
+   dropped: residual too high to be the same design
+paste-1790299693113-2485136.png          1031x566   ring-scale 1.1894  offset (+4.5,-1.5)  fits 320 pts  affine ['0.990/+2.3', '1.000/+0.0', '0.990/+2.3']  residual 0.50 luma
+paste-1790354373712-2610946.png           854x472   ring-scale 1.0025  offset (+4.5,-1.5)  fits 375 pts  affine ['0.994/+1.3', '0.994/+1.2', '0.995/+1.2']  residual 0.24 luma
+
+coverage (sources bare per cell):
+   0-  8  2  4  4  4  4  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  4
+   8- 15  4  4  4  4  4  4  4  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  4  4
+  15- 22  4  4  4  4  4  4  4  3  3  3  3  3  2  2  2  2  2  2  2  3  3  3  3  3  3  3  3  3
+  22- 30  3  3  3  4  4  4  3  3  2  2  2  1  0  1  2  2  2  1  2  2  2  2  2  2  2  2  2  2
+  30- 38  3  4  4  4  4  4  4  3  1  0  1  2  0  0  0  0  0  0  0  1  2  2  1  1  2  2  2  2
+  38- 45  4  4  4  4  4  4  3  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  1
+  45- 52  4  4  3  3  4  3  3  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+  52- 60  4  4  3  3  4  3  3  2  2  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  3
+  60- 68  4  4  4  4  4  4  4  4  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  1  2
+  68- 75  4  4  4  4  4  4  4  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1
+  75- 82  4  4  4  4  4  4  3  3  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  1  2
+  82- 90  4  4  4  4  3  4  1  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  2  3
+  90- 98  4  4  4  4  2  2  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+  98-105  3  4  4  4  4  2  1  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ 105-112  4  4  4  4  4  4  3  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+ 112-120  4  4  4  4  4  2  2  2  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  2
+ 120-128  3  4  4  4  4  4  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1
+ 128-135  3  4  4  4  4  4  2  4  3  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  1  2  3
+ 135-142  4  4  4  4  4  4  4  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+ 142-150  4  4  4  4  4  4  4  4  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2  2
+ 150-158  3  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4
+ 158-165  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4
+ 165-172  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4
+ 172-180  3  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4  4
+
+497 of 672 cells measured; 175 filled by smooth continuation of the measured field
+
+luma field (rows: angle 0=right mouth -> 180=left, cols: t 0=inner wall -> 1=outer):
+   0-  8 224 210 201 196 193 191 190 191 192 195 196 198 200 202 204 206 208 211 213 215 216 218 219 220 220 222 226 233
+   8- 15 224 210 202 197 194 191 191 192 193 195 197 198 200 202 204 206 208 210 211 213 215 216 216 217 218 220 225 232
+  15- 22 224 211 202 197 194 192 192 193 195 196 198 199 201 202 204 206 207 208 210 211 212 213 213 214 216 218 223 231
+  22- 30 225 211 203 198 195 194 195 195 196 197 199 200 201 203 204 205 207 207 208 209 209 210 210 211 213 217 222 230
+  30- 38 224 211 203 198 196 196 197 197 198 199 199 200 202 204 205 206 207 207 208 208 208 208 208 210 211 214 219 229
+  38- 45 225 211 203 200 199 198 198 199 199 200 201 202 203 204 205 206 207 207 208 208 208 209 209 210 211 210 217 227
+  45- 52 224 212 206 203 201 200 200 200 201 202 203 204 205 205 206 207 207 208 208 208 208 209 209 210 211 213 217 221
+  52- 60 224 214 208 205 204 203 202 202 203 203 205 205 206 207 207 208 208 208 208 208 209 209 209 210 210 211 216 224
+  60- 68 225 216 210 208 206 205 205 204 205 206 206 207 207 208 208 208 208 209 209 209 209 209 209 209 209 204 213 223
+  68- 75 226 218 213 210 208 207 207 206 207 208 208 209 209 209 209 209 209 209 209 209 209 209 209 210 210 211 214 220
+  75- 82 227 219 215 212 211 209 208 208 209 210 211 211 211 211 210 210 210 209 209 209 209 209 209 210 211 213 215 216
+  82- 90 226 220 216 214 212 211 210 210 212 213 213 213 213 212 212 211 210 210 209 209 209 209 209 210 212 214 216 215
+  90- 98 231 227 225 224 223 222 218 217 216 216 216 215 214 214 213 212 211 210 209 209 208 208 209 210 212 214 217 218
+  98-105 237 233 229 227 226 226 225 221 220 219 218 217 216 215 214 213 212 210 209 208 207 207 207 209 211 215 219 222
+ 105-112 240 234 231 229 228 227 226 225 224 223 221 220 219 217 216 214 212 211 209 208 206 205 205 206 209 214 221 234
+ 112-120 241 236 232 231 230 229 228 227 225 224 222 220 219 217 216 214 212 210 209 207 205 204 205 206 209 213 221 234
+ 120-128 241 237 234 232 231 230 230 228 227 225 223 221 219 217 216 214 212 210 208 207 205 205 205 206 209 213 220 230
+ 128-135 239 238 235 233 232 232 231 230 228 226 224 222 219 218 216 214 212 210 208 207 205 204 205 206 209 213 220 230
+ 135-142 238 239 235 234 233 233 232 230 229 226 225 223 220 218 216 214 212 210 208 207 205 205 205 207 209 213 220 230
+ 142-150 236 240 236 235 234 233 232 231 229 227 225 222 220 218 216 214 212 210 209 207 205 205 206 207 209 213 220 229
+ 150-158 234 240 236 234 234 233 232 231 229 227 225 222 220 218 216 214 212 210 209 207 205 205 206 207 210 213 220 229
+ 158-165 232 240 236 234 233 232 232 231 229 226 225 223 220 218 216 214 212 211 209 207 205 205 206 207 210 214 220 229
+ 165-172 231 240 235 233 232 232 231 230 228 226 224 222 220 218 216 214 212 211 209 207 206 205 206 208 210 214 220 229
+ 172-180 228 239 234 232 231 230 230 228 227 225 224 222 220 218 216 215 213 211 210 208 206 206 206 208 211 214 220 229
+
+
+JS FIELD: 24 sectors (angle 0 -> 180) x 28 stops (t 0 -> 1), hex rrggbb
+  ["e0dfe8", "d2d1da", "cac7d3", "c7c1ce", "c3becb", "c1bcc9", "bfbbc8", "bebec9", "bfbfca", "c1c1cd", "c3c3ce", "c5c5d0", "c6c7d2", "c8c9d4", "cbcbd6", "cdcdd8", "cfcfdb", "d1d2dc", "d3d4de", "d5d6e1", "d7d7e2", "d8d9e4", "dadae5", "dadae5", "dbdbe6", "dddde8", "e2e0ec", "eae7f3"],
+  ["e0dfe9", "d2d1da", "cbc8d3", "c7c2cf", "c4bfcb", "c1bdc9", "bfbdc9", "bfbfc9", "c0c0cb", "c2c2cd", "c3c3cf", "c5c5d0", "c7c7d2", "c8c9d4", "cbcbd6", "cccdd8", "cecfda", "d0d1dc", "d2d2dd", "d3d4df", "d5d6e1", "d6d7e2", "d7d7e2", "d8d8e3", "d9d9e4", "dcdbe6", "e1dfea", "e9e6f2"],
+  ["e0dfe8", "d3d2db", "cbc8d3", "c8c2cf", "c5bfcc", "c2bdca", "c1beca", "c0c0cb", "c2c2cd", "c3c3ce", "c4c4cf", "c6c6d1", "c7c8d3", "cac9d5", "cccbd6", "ccccd7", "ceced9", "cfcfda", "d1d0dc", "d2d1dd", "d2d2dd", "d3d3de", "d4d4df", "d6d5e0", "d7d6e2", "dbd8e4", "dfdde8", "e7e6ef"],
+  ["e1e0e9", "d3d2db", "ccc9d4", "c8c3d0", "c5c0cd", "c4bfcc", "c4c0cd", "c4c1cd", "c4c3ce", "c4c4cf", "c5c5d0", "c6c6d2", "c8c8d3", "cacad5", "cbcbd6", "cbccd7", "cdced8", "ceced9", "cfceda", "cfd0db", "d0d0dc", "d1d1dc", "d1d1dd", "d2d2dd", "d5d3df", "d9d6e2", "dedce7", "e6e5ef"],
+  ["e0dfe9", "d4d1dd", "ccc9d5", "c8c3d0", "c7c1ce", "c5c2ce", "c5c3ce", "c4c3cf", "c5c4d0", "c6c6d1", "c5c7d1", "c7c7d2", "c9c9d4", "cbcad5", "cccbd6", "cccdd7", "cdcdd8", "ceced9", "cfceda", "ceceda", "cecfda", "cecfda", "cfcfdb", "d0d0dc", "d3d1dc", "d7d4df", "ddd9e4", "e6e3ed"],
+  ["e1dfea", "d3d1dc", "ccc9d5", "c9c6d2", "c7c5d1", "c5c5d0", "c6c5d0", "c5c5d0", "c6c6d1", "c7c7d2", "c8c8d3", "c9c9d4", "cacad5", "cbcbd6", "ccccd7", "cdcdd8", "ceced8", "ceced9", "cfced9", "cfcfda", "cfcfda", "cfcfda", "d0d0db", "d1d0db", "d3d1dc", "d3d0dc", "d8d7e2", "e3e2ec"],
+  ["e0dee9", "d4d2dc", "ceccd7", "ccc9d5", "c9c7d3", "c8c7d2", "c7c7d2", "c6c7d1", "c8c8d3", "c9c9d4", "cacad4", "cbcad5", "cccbd6", "ccccd7", "cdcdd7", "ceced8", "ceced9", "cfced9", "cfcfd9", "cfcfda", "cfcfda", "d0cfda", "d0d0db", "d1d0db", "d2d1dc", "d5d3de", "d9d7e2", "dddbe6"],
+  ["e0dee9", "d6d4df", "d0ceda", "cdccd7", "cbcad6", "c9cad5", "c9c9d4", "c9c9d5", "cacad5", "cbcad5", "cccbd6", "ccccd7", "cdcdd7", "cecdd8", "ceced8", "cfced9", "cfced9", "cfcfd9", "d0cfd9", "d0cfda", "d0cfda", "d0d0da", "d1d0da", "d1d0db", "d2d0db", "d4d1dc", "d9d5e0", "e0dee9"],
+  ["e1dfea", "d8d6e1", "d3d0dc", "cfceda", "cdcdd8", "ccccd7", "cccbd7", "cbcbd6", "cbccd6", "cdccd7", "cecdd8", "ceced8", "cfced8", "cfced9", "cfcfd9", "d0cfd9", "d0cfd9", "d0cfd9", "d0cfd9", "d0cfd9", "d0cfda", "d1d0da", "d1d0da", "d1d0da", "d1cfda", "cdcad5", "d5d3dd", "dfdde7"],
+  ["e2e0e9", "dad8e2", "d5d3df", "d1d1dc", "cecfda", "ceced9", "cdced9", "cccdd7", "ceced8", "cfced9", "d0cfd9", "d0cfda", "d0d0da", "d1d0da", "d1d0da", "d1d0da", "d1d0da", "d1d0d9", "d0d0d9", "d0cfd9", "d1d0d9", "d1d0da", "d1d0da", "d2d0da", "d2d0da", "d3d1db", "d7d5de", "dbdae3"],
+  ["e3e1eb", "dcdae4", "d7d5e1", "d3d3de", "d1d1dc", "d0d0db", "cfcfda", "cfcfd9", "d0d0db", "d1d1db", "d2d1db", "d2d1db", "d2d1db", "d2d1db", "d2d1db", "d2d1da", "d1d0da", "d1d0da", "d1d0d9", "d1d0d9", "d1d0d9", "d1d0d9", "d1d0da", "d2d1da", "d3d1db", "d5d3dd", "d8d4de", "d7d6e0"],
+  ["e1e0e9", "dbdae4", "d7d7e2", "d5d5e0", "d3d3de", "d2d2dd", "d1d1dc", "d1d1dc", "d4d3dd", "d4d4dd", "d5d4dd", "d4d3dd", "d4d3dd", "d4d3dc", "d3d2db", "d3d2db", "d2d1da", "d2d0da", "d1d0d9", "d1d0d9", "d1cfd9", "d1cfd9", "d1d0d9", "d2d1da", "d4d2db", "d6d4dd", "d9d6e1", "d7d5e1"],
+  ["e7e6ef", "e3e2eb", "e1e0e9", "e0dfe8", "dfdee7", "dfdde5", "dad9e2", "d8d7e1", "d8d7e1", "d8d7e0", "d7d6e0", "d7d6df", "d6d5de", "d6d4dd", "d5d3dc", "d4d3db", "d3d2db", "d2d1da", "d1d0d9", "d1cfd8", "d0cfd8", "d0cfd8", "d1cfd8", "d2d0d9", "d4d2db", "d7d5dd", "d9d7e0", "dad8e1"],
+  ["edecf4", "e8e7f0", "e5e4ec", "e3e2ea", "e1e1e9", "e2e1e9", "e3dee7", "dedce5", "dcdbe4", "dbdae3", "dbd9e2", "dad8e1", "d8d7e0", "d7d6df", "d6d5dd", "d5d3dc", "d4d2db", "d3d1da", "d1d0d8", "d0cfd7", "cfced7", "cfced6", "cfced6", "d1cfd8", "d3d2da", "d7d5dd", "dcdae1", "dfdde4"],
+  ["efeff6", "eae9f1", "e7e6ee", "e5e4ec", "e3e2eb", "e2e1ea", "e1e0e9", "e2e0e8", "e0dfe7", "dfdee5", "dedbe5", "dddae4", "dad9e2", "d8d8e0", "d9d6de", "d7d5dd", "d4d3db", "d3d1d9", "d1d0d8", "d0ced6", "ceccd5", "cdccd4", "cdccd4", "cfcdd5", "d1d0d7", "d6d5db", "dedce1", "eae9ee"],
+  ["f1f0f8", "ebeaf3", "e8e7f0", "e7e6ee", "e6e4ed", "e5e4ee", "e4e3eb", "e3e1ea", "e1e0e8", "e0dfe7", "dedde6", "dedae5", "dbd9e3", "d9d8e1", "d8d6de", "d6d5dd", "d4d3db", "d2d1da", "d1d0d8", "ceced6", "cccdd5", "caccd4", "cbcdd5", "ccced6", "d0d0d8", "d5d4dc", "dddbe1", "eae9ef"],
+  ["f1f0f8", "edecf4", "e9e8f1", "e8e7ef", "e7e6ef", "e6e5ee", "e6e4ec", "e4e2eb", "e2e1ea", "e1e0e8", "dedfe6", "dcdce4", "dadae3", "d9d8e1", "d8d6de", "d6d4dd", "d4d2db", "d3d1da", "d0cfd8", "cdced6", "cbcdd4", "cbccd4", "cbccd4", "cdcdd5", "d0d0d8", "d6d4dc", "dcdbe1", "e6e5eb"],
+  ["efeef7", "ededf5", "eaeaf2", "e9e8f1", "e8e7f0", "e8e6f0", "e8e6ed", "e7e4ed", "e6e2ec", "e1e0ea", "e0dfe8", "dedde5", "dbdae3", "d9d8e1", "d8d6df", "d6d4dd", "d4d2db", "d1d1da", "d0d0d8", "cdced6", "caccd4", "caccd4", "cbccd4", "cdced7", "d0cfda", "d5d4dd", "dddbe2", "e5e5eb"],
+  ["eeedf5", "eeeef5", "ebeaf2", "eae8f1", "e9e8f1", "e9e7f0", "eae7ef", "e6e5ee", "e4e3ec", "e2e1ea", "e1dfe8", "dfdde6", "dddbe3", "dad8e2", "d8d7df", "d6d5de", "d4d3db", "d2d1da", "d0cfd9", "cdcdd7", "ccccd5", "ccccd5", "ccccd5", "ceced6", "d1d0d9", "d5d4dd", "dcdae2", "e6e5eb"],
+  ["ebebf2", "efeff6", "eceaf3", "ebe9f2", "e9e8f1", "e9e8f1", "e8e7ef", "e8e6ee", "e6e4ec", "e3e1ea", "e2dfe8", "dfdde5", "dcdbe4", "dad8e2", "d8d7df", "d6d5de", "d4d2dd", "d2d1db", "cfd0d9", "cdced7", "cbccd5", "cbccd5", "cccdd6", "cdced6", "d0d1d9", "d5d4dd", "dcdae2", "e5e4eb"],
+  ["eae9f1", "f0eff6", "eceaf3", "eae9f1", "e9e8f1", "e9e8f1", "e8e7f0", "e7e6ee", "e5e4ec", "e3e2ea", "e1dfe8", "dedde5", "dcdbe3", "dad9e1", "d8d7df", "d6d5dd", "d5d3dc", "d2d1da", "d1cfd8", "d0ced7", "cdccd5", "cdccd4", "cecdd6", "cfced6", "d2d0d9", "d5d4dd", "dbdbe2", "e5e4eb"],
+  ["e8e7ef", "f0eff6", "ebeaf3", "e9e8f1", "e8e8f0", "e8e7f0", "e7e6ef", "e6e5ee", "e5e4ec", "e2e1ea", "e0dfe8", "dedde5", "dcdbe4", "dad9e2", "d8d7df", "d6d5de", "d4d3dc", "d2d1da", "cfd0d8", "cdcfd6", "cbcdd5", "cbcdd5", "cccdd6", "cecfd7", "d2d1d9", "d6d4dd", "dbdbe3", "e4e4ea"],
+  ["e7e6ee", "efeff5", "eaeaf1", "e8e7f0", "e8e6ef", "e7e6ef", "e7e6ee", "e5e4ec", "e4e3eb", "e2e1e9", "e0dfe7", "dedde5", "dcdbe3", "dad9e1", "d8d7df", "d6d5de", "d4d3dc", "d3d1db", "d0d0d9", "cdcfd7", "cccdd5", "cbcdd5", "ccced6", "cecfd8", "d2d1da", "d6d5de", "dcdbe3", "e4e4eb"],
+  ["e4e2eb", "efeef6", "e9e8f1", "e8e6ef", "e7e6ee", "e6e5ed", "e5e4ed", "e4e3eb", "e3e2ea", "e1e0e9", "dfdee7", "dedde5", "dcdae3", "dad9e1", "d8d7df", "d7d6de", "d5d4dc", "d3d2db", "d2d0d9", "cfd0d7", "cdced6", "cccdd5", "ccced6", "cecfd7", "d2d1da", "d6d5de", "dcdbe4", "e4e4ec"],

@@ -1,0 +1,218 @@
+ok    dealt speeds: r.m.s.                                                  measured 431.93 m/s       formula 432.80 m/s       0.20% (within 3.0%)
+                                                                            sqrt(3RT/M) = 433 m/s, the speed the temperature is defined by
+ok    dealt speeds: mean                                                    measured 398.02 m/s       formula 398.75 m/s       0.18% (within 2.5%)
+                                                                            sqrt(8RT/(pi M)) = 399 m/s, the one that decides how often a wall is hit
+ok    dealt speeds: temperature                                             measured 298.80 K         formula 300.00 K         0.40% (within 2.0%)
+                                                                            (1/2)m<v^2> = (3/2)kT, which is the definition of temperature, not a formula for it
+ok    dealt speeds: the peak                                                measured 0.077000         formula 0.082883         7.10% (within 20.0%)
+                                                                            the middle tenth around sqrt(2kT/m) = 354 m/s holds as much of the gas as the curve says it should
+ok    dealt speeds: the whole curve                                         measured 0.0070932        formula 0.0000           0.71% (within 3.0%)
+                                                                            the largest gap between the measured and analytic distributions over 60 speeds
+ok    two gases at one temperature: speed ratio                             measured 3.1417 x         formula 3.1592 x         0.55% (within 3.0%)
+                                                                            helium at 300 K is 3.16 times faster than argon at 300 K, and 300 means 300 for both
+ok    two gases at one temperature: and it is the same 300 K                measured 295.50 K         formula 298.80 K         1.10% (within 3.0%)
+                                                                            which is what 'at the same temperature' has to mean if the theory is to hold
+ok    the step is set by the gas: helium is cut finer                       measured 0.24206 x        formula 0.24206 x        0.00% (within 0.0%)
+                                                                            one diameter over the r.m.s. speed: a lighter molecule gets a finer clock
+ok    the step is set by the gas: argon's step in diameters                 measured 0.19960          formula 0.20000          0.20% (within 3.0%)
+                                                                            a fifth of a diameter per step, so a collision is resolved well inside the distance it happens over
+ok    the step is set by the gas: helium's step in diameters                measured 0.19849          formula 0.20000          0.75% (within 3.0%)
+                                                                            the same fifth, bought with a step three times smaller
+ok    collision: momentum                                                   measured 5.8803e-39 kg m/s formula 0.0000 kg m/s    0.00% (within 0.0%)
+                                                                            argon and helium, closing off-axis: the pair's momentum is bit-for-bit unchanged
+ok    collision: energy                                                     measured -6.0185e-36 J    formula 0.0000 J         0.00% (within 0.0%)
+                                                                            and so is its kinetic energy, which is what makes the collision elastic
+ok    collision: and the two actually met                                   measured 5.8775e-39 kg m/s formula 0.0000 kg m/s    0.00% (within 0.0%)
+                                                                            the totals above are the ones before the collision, so this says the impulse happened
+ok    head-on: the heavy one                                                measured 408.93 m/s       formula 408.93 m/s       0.00% (within 1.0%)
+                                                                            (m1-m2)/(m1+m2) v: argon keeps 0.82 of its speed firing into helium
+ok    head-on: the light one                                                measured 908.93 m/s       formula 908.93 m/s       0.00% (within 1.0%)
+                                                                            2m1/(m1+m2) v: helium leaves at 1.82 times what the argon came in at
+ok    insulated walls: a molecule's speed                                   measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            twenty thousand bounces off smooth walls and not one of them changed |v| by a bit
+ok    insulated walls: the temperature                                      measured 0.0000 K         formula 0.0000 K         0.00% (within 0.0%)
+                                                                            which is what an adiabatic wall is: no heat in, no heat out
+ok    insulated walls: no molecule lost                                     measured 400.00           formula 400.00           0.00% (within 0.0%)
+                                                                            a closed box stays closed
+ok    insulated walls: the ledger                                           measured 0.0000 J         formula 0.0000 J         0.00% (within 0.0%)
+                                                                            U - U0 - Q - W is zero, and with insulated walls it holds to the last bit
+ok    a thermal wall: a cold gas warms to it                                measured 448.11 K         formula 450.00 K         0.42% (within 4.0%)
+                                                                            300 K of argon in a box held at 450 K arrives at 450 K, from the walls alone
+ok    a thermal wall: a hot gas cools to it                                 measured 449.24 K         formula 450.00 K         0.17% (within 4.0%)
+                                                                            and 700 K in the same box comes down to the same 450 K: the wall is not one-way
+ok    what leaves through a hole: its energy                                measured 1.1371e-20 J     formula 1.1045e-20 J     2.95% (within 8.0%)
+                                                                            2kT, not (3/2)kT: fast molecules reach the hole more often, and the hole is honest about it
+ok    P = n k T: the pressure                                               measured 1.3329e+6 Pa     formula 1.2851e+6 Pa     3.72% (within 5.0%)
+                                                                            momentum handed to the walls against n k T; the two are measured independently
+ok    P V / N k T: the compressibility                                      measured 1.0372           formula 1.0000           3.72% (within 6.0%)
+                                                                            one, to within the hard-sphere correction the next line predicts
+ok    P V / N k T: the spheres' correction                                  measured 1.0372           formula 1.0254           1.15% (within 4.0%)
+                                                                            Z = 1 + B2 n = 1.0254: a gas of spheres is not quite an ideal gas
+ok    six faces, one pressure                                               measured 0.024176         formula 0.0000           2.42% (within 3.0%)
+                                                                            each wall agrees to 2.4%: the gas does not know which way is up
+ok    impacts per unit area per second                                      measured 3.1994e+28 1/(m^2 s) formula 3.0855e+28 1/(m^2 s) 3.69% (within 4.0%)
+                                                                            n v-bar / 4: the count, against the formula, and the pressure is what they add up to
+ok    ledger: an idle insulated box                                         measured -4.1648e-33 J    formula 0.0000 J         0.00% (within 0.0%)
+                                                                            no walls exchanging, no lid moving: U - U0 - Q - W is zero and Q and W are both zero
+ok    ledger: mid-squeeze, scaled                                           measured 1.3572e-15       formula 0.0000           0.00% (within 0.0%)
+                                                                            a squeezed adiabatic box, twelve thousand energy exchanges, and the books balance
+ok    ledger: the lid did the work                                          measured 1.0000           formula 1.0000           0.00% (within 0.0%)
+                                                                            everything the gas gained came through the lid: W is what the molecules felt
+ok    ledger: nothing was heated                                            measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            insulated walls hold the gas at its own temperature while the lid compresses it
+ok    ledger: a box of thermal walls                                        measured 1.2580e-16       formula 0.0000           0.00% (within 0.0%)
+                                                                            three hundred joules of heat through the walls and not a milliwatt in the cracks
+ok    ledger: and it really did take heat                                   measured 0.41057          formula 0.40000          2.64% (within 15.0%)
+                                                                            the energy came in through Q, because nothing else in that box can move energy
+ok    adiabatic squeeze: gamma from P and V                                 measured 1.7413           formula 1.6667           4.48% (within 6.0%)
+                                                                            P V^gamma with gamma = 5/3, read off the measured pressure at two volumes
+ok    adiabatic squeeze: and what the spheres add                           measured 1.7413           formula 1.7111           1.77% (within 2.0%)
+                                                                            gamma = 1 + 2Z/3 + dlnZ/dlnV = 1.7111: the gas is not made of points, and this says how much
+ok    adiabatic squeeze: the temperature                                    measured 1.6457 x         formula 1.5871 x         3.69% (within 5.0%)
+                                                                            T V^(gamma-1) = constant is the same law, and it comes with it
+ok    adiabatic squeeze: nothing heated it                                  measured 0.0000 J         formula 0.0000 J         0.00% (within 0.0%)
+                                                                            insulated walls: the temperature rose because the lid did work, not because heat arrived
+ok    isothermal squeeze: P V                                               measured 1.0228 x         formula 1.0000 x         2.28% (within 4.0%)
+                                                                            Boyle's law: halve the volume and the pressure doubles, because the lid is a heat bath
+ok    isothermal squeeze: the temperature                                   measured 300.67 K         formula 300.00 K         0.22% (within 3.0%)
+                                                                            the gas stays at the lid's temperature, which is the whole difference from the line above
+ok    isothermal squeeze: the internal energy                               measured 0.025106 x       formula 0.0000 x         2.51% (within 5.0%)
+                                                                            U = (3/2) N k T and T did not move, so U did not either
+ok    isothermal squeeze: no net heat at all                                measured 0.043037         formula 0.0000           4.30% (within 10.0%)
+                                                                            the lid gave back what it took: an isothermal squeeze leaves no trace in the books, and none in U
+ok    free expansion: the temperature                                       measured 1.0000 x         formula 1.0000 x         0.00% (within 3.0%)
+                                                                            into vacuum there is nothing to push against, so no work is done and the gas does not cool
+ok    free expansion: the internal energy                                   measured 1.1634e-15 x     formula 0.0000 x         0.00% (within 3.0%)
+                                                                            and U is untouched, which is what 'no work and no heat' adds up to
+ok    free expansion: the pressure at the back wall                         measured 2.0891 x         formula 2.0000 x         4.45% (within 6.0%)
+                                                                            double the volume, half the molecules at the back wall, half the pressure
+ok    free expansion: P V is unchanged                                      measured 0.95737 x        formula 1.0000 x         4.26% (within 8.0%)
+                                                                            the same sentence as the two above, and the one the textbook writes as P V = const
+ok    free expansion: nothing crossed a boundary                            measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            no heat and no work, in any amount: the gas is simply somewhere else now, and it is the same gas
+ok    a partition: nobody is on the far side                                measured 0.0000 pm        formula 0.0000 pm        0.00% (within 0.0%)
+                                                                            a gas dealt behind a partition is a gas in half a box, and after three thousand collisions none of it is in the other half
+ok    a partition: and the gas reaches it                                   measured 170.00 pm        formula 170.00 pm        0.00% (within 1.0%)
+                                                                            the gap is one molecular radius and no more: the outermost molecules are pressed against the partition, which is as close as a centre can come
+ok    a partition: the gas's own volume                                     measured 0.50000 x        formula 0.50000 x        0.00% (within 0.0%)
+                                                                            half the box, because that is what the gas has expanded into so far
+ok    a partition: the gas's own density                                    measured 2.0000 x         formula 2.0000 x         0.00% (within 0.0%)
+                                                                            twice the whole box's, because the same gas is in half of it
+ok    a partition: the pressure where the gas is                            measured 1.0602           formula 1.0423           1.71% (within 4.0%)
+                                                                            the gas's own pressure over its own half: the ideal gas law, with the spheres' correction, where the gas is
+ok    a partition: and it is the half the whole box's surface hides         measured 0.50000 x        formula 0.50000 x        0.00% (within 3.0%)
+                                                                            averaged over the lid the gas has never reached, the same momentum reads half: this is the readout the contact surface exists to prevent
+ok    a partition: take it out and the volume doubles                       measured 2.0000 x         formula 2.0000 x         0.00% (within 0.0%)
+                                                                            the gas's volume, from the near side of the partition to the lid
+ok    a partition: take it out and the pressure halves                      measured 2.0478 x         formula 2.0000 x         2.39% (within 6.0%)
+                                                                            twice the volume, so half the density and half the pressure - Boyle's law by division, with no work done to get there
+ok    a partition: take it out and nobody was heated                        measured 1.0000 x         formula 1.0000 x         0.00% (within 3.0%)
+                                                                            free expansion into vacuum: no heat, no work, and the same temperature over a doubled volume
+ok    the window temperature is the window's                                measured 300.41 K         formula 300.41 K         0.00% (within 0.0%)
+                                                                            the mean of the instantaneous temperature over exactly the steps the pressure is averaged over
+ok    and the compressibility it makes                                      measured 1.0329           formula 1.0169           1.57% (within 4.0%)
+                                                                            a pressure and a temperature from one window, and the spheres' correction where it should be
+ok    the impact rate the panel reports                                     measured 2.1206e+28 1/(m^2 s) formula 2.0753e+28 1/(m^2 s) 2.18% (within 5.0%)
+                                                                            n v-bar / 4, through the panel's own accessor and over the surface the gas actually touches
+ok    a closing lid: the bounce                                             measured -340.00 m/s      formula -340.00 m/s      0.00% (within 0.0%)
+                                                                            2u - v: the bounce in the lid's frame is a bounce, so it comes back 40 m/s faster
+ok    a closing lid: the work                                               measured 8.4909e-22       formula 8.4909e-22       0.00% (within 0.0%)
+                                                                            and the work booked is exactly the energy the molecule gained
+ok    a receding lid: the slow molecule                                     measured 100.00 m/s       formula 100.00 m/s       0.00% (within 0.0%)
+                                                                            a lid running away at 250 m/s cannot catch a molecule doing 100 - it does not touch it
+ok    a receding lid: the fast molecule                                     measured 200.00 m/s       formula 200.00 m/s       0.00% (within 0.0%)
+                                                                            and it does catch the one doing 300, which goes back at 200: 2u - v again
+ok    a receding lid: who paid                                              measured -1.6584e-21 J    formula -1.6584e-21 J    0.00% (within 0.0%)
+                                                                            the gas handed the lid the difference, and the ledger says so
+ok    work: collisions against -integral P dV                               measured 3.6442e-18 J     formula 3.6006e-18 J     1.21% (within 5.0%)
+                                                                            a million impacts adding up to the area under the pressure-volume curve
+ok    collisions: three times the gas, three times as often                 measured 3.0183 x         formula 3.0000 x         0.61% (within 5.0%)
+                                                                            the collisions per molecule per second are proportional to the density: lambda = 1/(sqrt2 pi d^2 n)
+ok    collisions: rate per molecule against v-bar / lambda                  measured 1.0652e+11 1/s   formula 1.0448e+11 1/s   1.95% (within 6.0%)
+                                                                            counted collisions against the textbook formula, which is the low-density limit of the truth
+ok    collisions: helium against argon, same box and temperature            measured 1.8125 x         formula 1.8474 x         1.89% (within 10.0%)
+                                                                            (d_He/d_Ar)^2 sqrt(M_Ar/M_He) = 1.85: lighter means faster, and a narrower sphere is a smaller target
+ok    collisions: the free path in a visible box                            measured 0.21028          formula 0.21000          0.13% (within 25.0%)
+                                                                            lambda/L ~ 0.2: a molecule crosses the box a few times between collisions, which is what makes them visible
+ok    effusion: helium against argon                                        measured 3.1909 x         formula 3.1592 x         1.00% (within 12.0%)
+                                                                            Graham's law: sqrt(M_Ar/M_He) = 3.16, and it is the mass ratio and nothing else
+ok    effusion: the rate against n v-bar A / 4                              measured 1.8856e+12 1/s   formula 1.5854e+12 1/s   18.93% (within 20.0%)
+                                                                            the molecules reaching the area they can actually get through: the right answer to about a tenth, for a hole a few mean free paths across
+ok    effusion: a bigger hole lets them out in proportion                   measured 4.5479 x         formula 4.2439 x         7.16% (within 10.0%)
+                                                                            the rate is the flux times the area that can be reached, and it is nothing else
+ok    a mixture: helium's temperature                                       measured 399.90 K         formula 400.00 K         0.02% (within 3.0%)
+                                                                            the light gas, in a box held at 400 K, at 400 K
+ok    a mixture: argon's temperature                                        measured 396.20 K         formula 400.00 K         0.95% (within 3.0%)
+                                                                            and the heavy gas at the same one: they share the temperature, and not the speeds
+ok    a mixture: and they really are different speeds                       measured 3.0718 x         formula 3.1592 x         2.77% (within 5.0%)
+                                                                            one box, one temperature, speeds in the ratio of the square roots of the masses
+ok    a mixture: the number of molecules                                    measured 2400.0           formula 2400.0           0.00% (within 0.0%)
+                                                                            half and half went in, and both halves are still accounted for
+ok    twenty thousand steps, everything on                                  measured 9.5727e-16       formula 0.0000           0.00% (within 0.0%)
+                                                                            heat, work, escapes and a hundred thousand collisions, and the books still balance to the last bit
+ok    the escape term is not being ignored                                  measured 1.0000           formula 1.0000           0.00% (within 0.0%)
+                                                                            1106 molecules left through the hole carrying their energy, and the books include it
+ok    a closed box loses nothing                                            measured 1500.0           formula 1500.0           0.00% (within 0.0%)
+                                                                            thirty thousand steps with a mixture of walls and nothing squeezed out of a corner
+ok    a moving lid leaves nobody outside it                                 measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            twelve thousand steps of a lid closing at the loudest pace allowed, checked every one of them
+ok    a loaded lid: it finds its own balance                                measured 0.51045 x        formula 0.50000 x        2.09% (within 6.0%)
+                                                                            loaded to twice the pressure it had, the gas settles at half the volume, unaided
+ok    a loaded lid: and it settles                                          measured 1.6639 m/s       formula 0.0000 m/s       166.39% (within 500.0%)
+                                                                            it shivers at 1.66 m/s, which is the gas nudging it, and it does not drift
+ok    a loaded lid: the pressure it settled at                              measured 1.9647 x         formula 2.0000 x         1.77% (within 8.0%)
+                                                                            and the pressure it settled at is the load, which is a pressure measurement made with a weight
+ok    a pressure-held lid: it finds its own balance                         measured 1.0118 x         formula 1.0000 x         1.18% (within 8.0%)
+                                                                            the air on the outside face set to the pressure the gas was holding the lid up with, and no weights on the lid
+ok    a pressure-held lid: and it stays there                               measured 0.97810 x        formula 1.0000 x         2.19% (within 10.0%)
+                                                                            it neither collapsed nor blew open, which is a lid held by a pressure rather than by iron
+ok    a pressure-held lid: the room comes back with the box                 measured 1.3315 MPa       formula 1.3315 MPa       0.00% (within 0.1%)
+                                                                            a restored box sits in the same room it was saved in
+ok    a flame: an insulated box comes to the flame's temperature            measured 902.81 K         formula 900.00 K         0.31% (within 4.0%)
+                                                                            the one wall it can exchange energy with is the flame, and the gas is heated one collision at a time until it agrees
+ok    a flame: a box in air settles between the flame and the air           measured 1.0000           formula 1.0000           0.00% (within 0.0%)
+                                                                            it sits at 366.5 K: above the air it stands in and below the flame it stands on
+ok    a flame: and nearer the air, because five faces of six are            measured 366.45 K         formula 400.00 K         8.39% (within 12.0%)
+                                                                            one face in six is the flame: an area-weighted mean of 400 K, and the gas sits a little under it because a hot surface also throws its molecules off faster
+ok    a flame: the heat came through the wall, not from nowhere             measured 6.8673e-15       formula 0.0000           0.00% (within 0.0%)
+                                                                            tens of thousands of collisions with a hot surface, and the first law still holds to the last bit
+ok    a flame: it hands over less as the box catches it up                  measured 1.0000           formula 1.0000           0.00% (within 0.0%)
+                                                                            the rate it delivers falls from 7.34e-10 W to -1.28e-9 W: a flame is a difference, and once the gas is as warm as the flame there is no difference left
+ok    a flame colder than the air cools the box instead                     measured 756.55 K         formula 800.00 K         5.43% (within 12.0%)
+                                                                            900 K of gas over a 300 K plate: the same six faces, the same arithmetic, the other sign
+ok    a flame: the timeline is refined for the molecules it makes           measured 2.0000 x         formula 2.0000 x         0.00% (within 0.0%)
+                                                                            four times the absolute temperature is twice the speed, and half the step
+ok    pressure: F / A, face by face                                         measured 1.5217e-16       formula 0.0000           0.00% (within 0.0%)
+                                                                            six faces, six areas: divide a face's force by its pressure and the area it started from comes back
+ok    pressure: the total force over the surface it acts on                 measured 1.0273e+6 Pa     formula 1.0273e+6 Pa     0.00% (within 0.0%)
+                                                                            the six-face average and the momentum-per-second account of it are the same measurement, not two
+ok    pressure: and what the gas's own state says it should be              measured 1.0326           formula 1.0198           1.26% (within 4.0%)
+                                                                            P V / N k T from the collisions themselves, against the ideal gas law with the spheres' correction
+ok    impacts: the mean momentum a wall collects                            measured 2.5030           formula 2.5066           0.14% (within 4.0%)
+                                                                            2 sqrt(pi/2) sqrt(m k T): fast molecules hit more often than slow ones, and the average collision knows it
+ok    impacts: each one recorded on the face it struck                      measured 0.0000 fm        formula 0.0000 fm        0.00% (within 0.0%)
+                                                                            512 sparks, and not one of them further than a femtometre from the plane it belongs to
+ok    impacts: the log is bounded                                           measured 512.00           formula 512.00           0.00% (within 0.0%)
+                                                                            30128 impacts in four thousand steps, and the newest 512 of them are the ones kept
+ok    impacts: switched off, nothing is recorded                            measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            the picture is a kindness to the reader, not a cost the physics pays
+ok    impacts: a young log has discarded nothing                            measured 1.0000           formula 1.0000           0.00% (within 0.0%)
+                                                                            127 impacts, every one of them still in the buffer: it only starts discarding once it is full
+ok    labs: every lab says what stands on its bench                         measured 14.000           formula 14.000           0.00% (within 0.0%)
+                                                                            all 14 of them, including the ones that need nothing, which say so with an empty list
+ok    labs: every lab says what its setup is                                measured 14.000           formula 14.000           0.00% (within 0.0%)
+                                                                            one line per lab naming the bench and the room, in the numbers its panels hold
+ok    labs: the instruments named are instruments that exist                measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            the four names are the four instruments, and no lab reaches past them
+ok    labs: a lab that lights a flame stands a burner under it              measured 3.0000           formula 3.0000           0.00% (within 0.0%)
+                                                                            3 labs burn gas, and every one of them puts the burner it burns at on the bench
+ok    labs: a lab that names the weights has a load on the lid              measured 2.0000           formula 2.0000           0.00% (within 0.0%)
+                                                                            2 labs hold their lid with iron, and the load is what stands on it
+ok    labs: the gauge is on the benches whose lid the air holds             measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            the gauge and an outside pressure go together on 1 of 14 benches, on a lid that is free to feel it
+ok    labs: and an outside pressure is always one the gauge can be read on  measured 0.0000           formula 0.0000           0.00% (within 0.0%)
+                                                                            a pressure stated with no dial to read it on is a condition nothing in the panel shows
+ok    labs: a free lid is held by something                                 measured 3.0000           formula 3.0000           0.00% (within 0.0%)
+                                                                            3 labs move their lid against a weight or against the air, and none of them left it to the gas
+
+108/108 checks passed

@@ -1,0 +1,1740 @@
+/* ============================================================================
+   Physics Workbench - visual language
+   ============================================================================ */
+:root{
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ---- one palette, both screens ----------------------------------------
+     The five colours the homepage's hero was measured off, and nothing else.
+     The workbench is built out of the same five, so opening it feels like
+     the page stepping forward rather than a different product. */
+  --home-bg-left:  #DBDAE3;   /* the light panel */
+  --home-bg-right: #CCCCD7;   /* the panel beside it */
+  --home-ink:      #34343F;
+  --home-ink-2:    #585763;
+  --home-ink-3:    #8A8794;
+  --home-violet:   #9E00FF;
+
+  /* the dark chrome: that ink taken down until it is a surface. Same hue,
+     never a black, never a warm grey. */
+  --shell:      #23232B;
+  --shell-2:    #2B2B34;
+  --shell-3:    #363640;
+  --shell-line: rgba(232,231,240,0.09);
+  --on-shell:   #E8E7EF;
+  --on-shell-2: #9D9CA8;
+  --on-shell-3: #6D6C78;
+
+  /* the light stage the scene sits on, a step lighter than the homepage's
+     own panels so the two never read as the same surface */
+  --stage:      #E7E6EE;
+  --stage-2:    #DEDDE7;
+  --stage-line: #C9C8D4;
+  --on-stage:   var(--home-ink);
+  --on-stage-2: var(--home-ink-2);
+  --on-stage-3: var(--home-ink-3);
+
+  /* one accent, and it means "this is the live one": focus rings, the button
+     that acts under the cursor, the running lamp, and the fast end of the
+     speed ramp in the scene. */
+  --accent:      var(--home-violet);
+  --accent-soft: rgba(158,0,255,0.12);
+  --danger:      #C58C93;
+  --danger-soft: rgba(197,140,147,0.14);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --shadow-1: 0 2px 10px rgba(52,52,63,0.10);
+
+  /* The names the workbench's own rules were written against, re-pointed at
+     the palette above: this is what flattens the old glasswork into matte
+     surfaces and hairlines in one move. */
+  --bg: var(--stage);
+  --surface: #F4F3F8;
+  --surface-2: var(--stage-2);
+  --border: rgba(52,52,63,0.10);
+  --border-2: rgba(52,52,63,0.06);
+  --text: var(--on-stage);
+  --text-muted: var(--on-stage-2);
+  --text-faint: var(--on-stage-3);
+  --side-bg: var(--shell);
+  --side-bg-2: var(--shell-2);
+  --side-bg-3: var(--shell-3);
+  --side-border: var(--shell-line);
+  --side-text: var(--on-shell);
+  --side-text-muted: var(--on-shell-2);
+  --side-text-faint: var(--on-shell-3);
+  --glass-idle-bg: var(--shell-2);
+  --glass-idle-border: var(--shell-line);
+  --glass-idle-shadow: none;
+  --glass-active-bg: var(--shell-3);
+  --glass-active-border: rgba(232,231,240,0.16);
+  --glass-active-shadow: none;
+  --accent-on-dark: var(--on-shell);
+  --accent-on-dark-soft: rgba(232,231,240,0.08);
+  --accent-on-dark-ink: var(--shell);
+  --accent-hover: #8700DC;
+  --danger-on-dark: var(--danger);
+  --danger-on-dark-soft: var(--danger-soft);
+  --shadow-2: 0 8px 24px rgba(52,52,63,0.14);
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%; overflow:hidden;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  flex-direction:column;
+}
+button{ font-family:inherit; }
+svg.lucide{ display:block; stroke:currentColor; }
+.tab-nums{ font-variant-numeric:tabular-nums; }
+/* the accent, used for the one thing it always means: you are here */
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+::selection{ background:var(--accent-soft); }
+
+/* ---------------------------------- title bar ---------------------------------- */
+.titlebar{
+  height:66px; flex:0 0 auto;
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  padding:0 28px;
+  border-bottom:1px solid var(--side-border);
+  background:var(--side-bg);
+}
+.brand{display:flex; align-items:center; gap:12px; justify-self:start;}
+/* the homepage's wordmark, one weight apart: the qualifier light, the noun bold */
+.brand .name{font-weight:500; font-size:16.5px; letter-spacing:-0.005em; color:var(--side-text);}
+.brand .name b{color:var(--accent-on-dark); font-weight:700;}
+
+/* selected controls invert: a light fill with an ink label, the same move the
+   homepage makes with its button, only the other way up */
+.view-toggle{
+  justify-self:center;
+  display:flex; gap:2px;
+  background:var(--shell-2);
+  border:1px solid var(--shell-line);
+  border-radius:var(--radius-pill);
+  padding:3px;
+}
+.view-toggle button{
+  display:flex; align-items:center; gap:6px;
+  border:none; background:transparent; cursor:pointer;
+  padding:7px 16px; border-radius:var(--radius-pill);
+  font-family:var(--font); font-weight:500; font-size:12.5px;
+  color:var(--on-shell-2);
+  transition:background .18s ease, color .18s ease;
+}
+.view-toggle button svg{ width:14px; height:14px; }
+.view-toggle button.on{ background:var(--on-shell); color:var(--shell); font-weight:600; }
+.view-toggle button:hover:not(.on){ color:var(--on-shell); }
+
+.title-actions{display:flex; align-items:center; gap:8px; justify-self:end;}
+
+.icon-btn{
+  width:36px; height:36px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:var(--radius-pill);
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--on-shell-2);
+  cursor:pointer;
+  transition:background .18s ease, color .18s ease;
+}
+.icon-btn svg{ width:16px; height:16px; }.icon-btn:hover{background:var(--shell-2);color:var(--on-shell);}
+/* Nothing to undo, nothing to go back to: an unavailable action is dimmed rather
+   than silently doing nothing. */
+.icon-btn:disabled{opacity:.35; cursor:default;}
+.icon-btn:disabled:hover{background:transparent; color:var(--on-shell-2);}
+
+.run-btn{
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--font); font-size:12.5px; font-weight:600; letter-spacing:-0.005em;
+  color:var(--shell);
+  background:var(--on-shell);
+  border:1px solid transparent;
+  border-radius:var(--radius-pill);
+  padding:9px 20px 9px 16px;
+  cursor:pointer;
+  transition:background .18s ease, color .18s ease, transform .08s ease;
+}
+.run-btn svg{ width:15px; height:15px; }
+.run-btn:hover{ background:var(--accent); color:#fff; }
+.run-btn:active{ transform:scale(.98); }
+.run-btn.paused{ background:transparent; color:var(--on-shell); border-color:var(--shell-line); }
+.run-btn.paused:hover{ background:var(--shell-2); color:var(--on-shell); }
+
+/* ------------------------------------- console ------------------------------------- */
+.console{flex:1 1 auto; display:grid; grid-template-columns:296px 1fr 308px; min-height:0;}
+
+/* ---- dark side panels ---- */
+.rail{background:var(--side-bg); color:var(--side-text); overflow-y:auto; min-height:0;}
+.rail::-webkit-scrollbar{width:8px;}
+.rail::-webkit-scrollbar-thumb{background:var(--side-bg-3); border-radius:4px;}
+.rail::-webkit-scrollbar-track{background:transparent;}
+/* A hairline where the chrome meets the stage - flat, the way the homepage
+   separates its own panels, with no shadow pretending they are apart. */
+.rail.left{ border-right:1px solid var(--shell-line); }
+.rail.right{ border-left:1px solid var(--shell-line); }
+
+/* tracked caps, the homepage's eyebrow treatment, one weight lighter */.panel-title{font-family:var(--font); font-size:10.5px; font-weight:600; letter-spacing:.18em; color:var(--on-shell-3); text-transform:uppercase; padding:16px 28px 13px;}
+/*
+   The rail's vertical rhythm, in three numbers.
+
+   A row of controls stands 11px off the row under it (`.ctrl`), the smallest
+   gap on a rail, because rows in one group are one list. An eyebrow stands
+   13 + 4px above the first row of its own group, so a heading belongs to what
+   it names instead of floating between two groups. And the last row of a group
+   stands 16 + 1 + 10 + 16px from the eyebrow of the next one, roughly three
+   rows' worth, which is what makes a rail of short groups read as groups
+   rather than as one long list.
+
+   Both rails are measured against these three numbers and nothing else, so the
+   two benches cannot drift apart: an eyebrow that stood closer to its own rows
+   on one bench than on the other is the whole column looking loose.
+*/
+.rail-section{padding:4px 28px 16px;}
+.rail-section + .panel-title{ border-top:1px solid var(--side-border); margin-top:10px; }
+/* A block on a rail that is only there when there is something in it. The one
+   on the Thermo bench is the instrument panel, and with nothing open it is not
+   an empty panel: it is no panel, heading and all, and the rail starts at the
+   gas. Its heading is inside the block rather than beside it, so the rule that
+   separates a section from the next heading is written against the block as
+   well, and taken back off when the block is not there - a hairline above the
+   first heading on a rail is a line separating nothing from nothing. */
+.instrument-panel + .panel-title{ border-top:1px solid var(--side-border); margin-top:10px; }
+.instrument-panel.is-hidden + .panel-title{ border-top:0; margin-top:0; }
+/* A toggle row is a control, so the row under it gets the air any other control
+   would get - without this a slider that belongs to the switch above it (the
+   partition, the burner's flame) starts on the switch's own bottom edge. */
+.toggle-row + .ctrl{ margin-top:11px; }
+.section-label{
+  font-size:13px; font-weight:600; color:var(--side-text); margin-bottom:18px;
+  letter-spacing:-0.01em;
+}
+/* One line under a section's own name, saying where the number came from. It is
+   neither a heading nor a control, so it takes the muted ink the readouts'
+   comparisons take, and it is pulled up under the name it belongs to rather
+   than standing a second gap off it. */
+.instrument-note{
+  margin:-13px 0 18px; font-size:11px; line-height:1.45;
+  color:var(--side-text-muted); letter-spacing:-0.005em;
+}
+.instrument-note:empty{ display:none; }
+
+/* ---------------------------------- form controls ---------------------------------- */
+.ctrl{margin-bottom:11px;}
+.ctrl:last-child{margin-bottom:0;}
+.ctrl-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;}
+.ctrl-label{font-size:12.5px; color:var(--side-text-muted); letter-spacing:-0.005em; font-weight:500;}
+/* The number is a control, not a caption: double-clicking it opens a field,
+   so it wears a hover surface and a focus ring like everything else on the
+   rail. The negative margin lets that surface sit in the panel's own padding
+   without moving the digits off the rail's right edge. */
+.ctrl-val{
+  position:relative; display:inline-flex; align-items:center; justify-content:flex-end;
+  min-width:42px; padding:3px 7px; margin:-3px -7px -3px 0; border-radius:7px;
+  font-size:11.5px; font-weight:600; color:var(--side-text); text-align:right;
+  cursor:pointer; user-select:none;
+  transition:background .15s ease, box-shadow .15s ease;
+}
+.ctrl-val:hover{ background:rgba(232,231,240,0.06); }
+.ctrl-val .val-field{
+  display:none;
+  width:100%; padding:0; border:0; outline:none; background:transparent;
+  font-family:inherit; font-size:inherit; font-weight:inherit;
+  color:var(--on-shell); text-align:right; font-variant-numeric:tabular-nums;
+}
+/* the editing state is one violet hairline inside the well: the same accent,
+   and the same meaning - the thing under the caret is the live one */
+.ctrl.editing .ctrl-val{ background:var(--shell-2); box-shadow:inset 0 0 0 1.5px var(--accent); }
+.ctrl.editing .val-text{ display:none; }
+.ctrl.editing .val-field{ display:block; }
+
+input[type="range"]{
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:3px; border-radius:2px;
+  background:var(--side-bg-3);
+  outline:none; cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:14px; height:14px; border-radius:50%;
+  background:var(--on-shell);
+  border:2px solid var(--shell);
+  cursor:pointer;
+  transition:transform .12s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover{ transform:scale(1.14); }
+input[type="range"]::-moz-range-thumb{
+  width:14px; height:14px; border-radius:50%;
+  background:var(--on-shell); border:2px solid var(--shell); cursor:pointer;
+}
+
+.seg{
+  display:flex; gap:2px; padding:3px;
+  border:1px solid var(--shell-line); border-radius:var(--radius-sm);
+  background:var(--shell-2);
+}
+.seg button{
+  flex:1 1 0; background:transparent; border:none; border-radius:6px;
+  color:var(--on-shell-2); font-family:var(--font); font-size:11.5px; font-weight:500;
+  /* The line box is declared rather than left to the font's own, because the
+     wide variant of this bar sets a smaller font, and a smaller font under a
+     normal line-height is a shorter button: the row of gases and the bar under
+     it would be a pixel different in height. Two bars in one column are one
+     bar, and the bar is 40px - the height of a switch row, and what nine
+     pixels of padding over a normal line box happened to come to before this
+     was pinned down. */
+  line-height:16px;
+  padding:8px 6px; cursor:pointer;
+  transition:background .18s ease, color .18s ease;
+}
+.seg button.on{ background:var(--on-shell); color:var(--shell); font-weight:600; }
+.seg button:hover:not(.on){ color:var(--on-shell); }
+
+/* One compact transform editor, using the same rail surfaces as the physics
+   controls. Axis fields share a single quiet well rather than looking like
+   twelve unrelated boxes. */
+.object-edit{margin-top:0;}
+.transform-groups{display:flex; flex-direction:column;}
+.transform-group{min-width:0;}
+.transform-group + .transform-group,
+.transform-groups + .transform-group{margin-top:13px; padding-top:13px; border-top:1px solid var(--side-border);}
+/* A shape's surface: the two coefficients the solver reads off whichever body
+   the ball actually hit. A slider row carries a label, a number and a track, so
+   the group needs the same room above its first one as PHYSICS gives its own. */
+.material-group .transform-group-title{margin-bottom:12px;}
+.material-reset{width:100%; margin-top:12px;}
+.material-reset:disabled{opacity:.45; cursor:default;}
+.material-reset:disabled:hover{background:var(--glass-idle-bg); border-color:var(--glass-idle-border);}
+.transform-group-title{margin-bottom:10px; color:var(--side-text-muted); font-size:11.5px; font-weight:500;}
+/* The mass group is the one group with a second row - the switch that takes a
+   shape out of the physics altogether - and it sits directly under the field,
+   with the same 2px the axis row's own fields are apart, so the two read as one
+   question: how heavy is this, and does it move at all. */
+.mass-fixed{margin-top:2px;}
+/* A vector is three columns. A group with a single field - the radius, the mass -
+   takes the whole row instead: a mass runs to 351.1200 kg and a third of the rail
+   cuts the last digits off, and a number that has to be guessed at is not a
+   readout. */
+.transform-axis-row{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px;
+}
+.transform-axis-row.lone{grid-template-columns:1fr;}
+.transform-axis{
+  min-width:0; height:35px; display:flex; align-items:center; gap:6px;
+  padding:0 8px; border:1px solid var(--shell-line); border-radius:var(--radius-sm);
+  background:var(--shell-2); transition:border-color .15s ease, background .15s ease;
+}
+.transform-axis:focus-within{
+  border-color:rgba(232,231,240,.22); background:var(--shell-3);
+}
+.transform-axis-label{
+  flex:0 0 auto; color:var(--on-shell-3); font-size:10px; font-weight:600;
+  text-transform:uppercase;
+}
+.transform-axis-input{
+  width:100%; min-width:0; padding:0; border:0; outline:none;
+  background:transparent; color:var(--on-shell); text-align:right;
+  font:600 11px/1 var(--font); font-variant-numeric:tabular-nums;
+  appearance:textfield; -moz-appearance:textfield;
+}
+.transform-axis-input::-webkit-inner-spin-button,
+.transform-axis-input::-webkit-outer-spin-button{margin:0; appearance:none; -webkit-appearance:none;}
+.transform-axis-input:focus-visible{outline:none;}
+.is-hidden{ display:none!important; }
+.object-delete{width:100%; margin-top:20px;}
+.object-delete:hover{border-color:var(--danger-on-dark); color:var(--danger-on-dark);}
+.object-edit .object-delete{margin-top:20px;}
+@media (max-width: 1280px){
+  .transform-axis-row{gap:4px;}
+  .transform-axis{gap:4px; padding:0 6px;}
+  .transform-axis-input{font-size:10px;}
+}
+@media (max-width: 1100px){
+  .transform-axis{gap:8px; padding:0 10px;}
+  .transform-axis-input{font-size:12px;}
+}
+
+.btn-row{display:flex; gap:8px; margin-top:8px;}.btn-row:first-of-type{margin-top:16px;}
+/* the delete button follows the angle slider, not another row of buttons, so it
+   inherits the slider's own margin rather than the row rule's */
+.object-edit .btn-row:first-of-type{margin-top:0;}.btn{flex:1 1 0; font-family:var(--font); font-size:12px; font-weight:600; padding:9px 10px; border-radius:var(--radius-sm);
+  border:1px solid var(--glass-idle-border);
+  background:var(--glass-idle-bg); box-shadow:var(--glass-idle-shadow); color:var(--side-text);
+  cursor:pointer;
+  transition:background .15s ease, border-color .15s ease;
+}
+.btn:hover{ background:var(--glass-active-bg); border-color:var(--glass-active-border); }
+/* The one button that acts, in the homepage's own language: the ink and the
+   background swapped over, and violet under the cursor. */
+.btn.primary{
+  border-color:transparent; background:var(--on-shell); color:var(--shell); font-weight:600;
+}
+.btn.primary:hover{ background:var(--accent); color:#fff; }
+.btn.danger{ color:var(--danger-on-dark); }
+.btn.danger:hover{ background:var(--danger-on-dark-soft); border-color:var(--danger-on-dark); color:var(--danger-on-dark); }
+
+/* A switch per row, on the same rhythm as a readout: the row stands 40px tall
+   with its switch centred, so a column of instruments stacks with 20px between
+   one control and the next instead of touching them off each other. */
+.toggle-row{display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:40px;}
+/* The knob is placed from the *padding* edge (it is absolutely positioned, so
+   the 1px border shifts its origin), and both ends are inset by the same 4px:
+   3px of `left` plus the border on one side, 3px of travel plus 13px of knob
+   plus the border on the other. Getting that arithmetic wrong is exactly how a
+   knob ends up hanging off the end of its own track. */
+.tswitch{
+  width:36px; height:20px; border-radius:999px;
+  background:var(--side-bg-3); position:relative; flex:0 0 auto; cursor:pointer;
+  border:1px solid var(--glass-idle-border);
+  padding:0; appearance:none; -webkit-appearance:none;
+  transition:background .15s ease;
+}
+.tswitch i{
+  position:absolute; top:50%; left:3px;
+  width:13px; height:13px; border-radius:50%;
+  transform:translate(0, -50%);
+  background:var(--on-shell-2);
+  transition:transform .18s cubic-bezier(.22,1,.36,1), background .18s ease;
+}
+.tswitch.on{ background:var(--on-shell); }
+.tswitch.on i{ transform:translate(15px, -50%); background:var(--shell); }
+
+/* ------------------------------------- viewport ------------------------------------- */
+.viewport{
+  position:relative;
+  background:var(--stage);
+  min-width:0; min-height:0;
+}
+#glcanvas{width:100%; height:100%; display:block; cursor:grab;}
+#glcanvas:active{cursor:grabbing;}
+/* Something under the pointer that can be picked up: the cursor says so before
+   the press commits to it. After :active on purpose - a press that has landed
+   on a ball is a move, not a grab of the empty stage. */
+#glcanvas.pickable, #glcanvas.pickable:active{cursor:move;}
+
+.viewport-controls{
+  position:absolute; z-index:12; top:18px; left:22px; right:22px;
+  /* Top-aligned, not centred. The right corner is a column of two controls
+     (the lab bench, and the zoom under it) and is therefore taller than the
+     launcher on the left, and a row that centres its children hangs that
+     launcher off the bottom of the taller one: two pills that are meant to
+     stand in one line, one of them a third of a pill lower. */
+  display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+  font-family:var(--font); pointer-events:none;
+}
+.viewport-controls > *{ pointer-events:auto; }
+.shape-launcher{ position:relative; }
+.shape-launcher-trigger:hover,.shape-launcher.is-open .shape-launcher-trigger{
+  background:var(--surface); color:var(--on-stage);
+}
+.shape-launcher-trigger:focus-visible,.shape-option:focus-visible{
+  outline:2px solid var(--stage-line); outline-offset:1px;
+}
+/* The shapes are on the left of the stage now, so the strip opens out of the
+   pill's right-hand side - away from the edge it is anchored to. */
+.shape-picker{
+  position:absolute; top:0; left:calc(100% + 6px);
+  display:flex; align-items:center; gap:2px; width:max-content; max-width:calc(100vw - 24px); height:34px;
+  overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none;
+  padding:0 2px; border:1px solid var(--border); border-radius:var(--radius-sm);
+  background:var(--surface); box-shadow:var(--shadow-1);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .14s ease, visibility .14s ease;
+}
+.shape-picker::-webkit-scrollbar{ display:none; }
+/* A strip of *systems* is longer than a strip of shapes, and it opens out of its
+   own pill towards the lab pill on the other side of the stage: seven of them in
+   one row ran straight under it. Two things keep that from happening.
+
+   It is **one row, always**: the strip is the row of names a reader scans, and a
+   second row is two things to read where there is one. `fitStrips` measures what
+   the row needs - the chips are nowrap and do not grow, so their widths are
+   theirs - and decides where the strip stands, but never how it is wrapped.
+
+   It stands beside its own pill when the room from the pill to the lab pill on
+   the far side of the stage is enough for all of it: then it is in the row, out
+   of everyone's way, and it touches nothing.
+
+   When that room is not enough - a laptop stage is about 860 px and seven names
+   are about 670 - it stands *under the pills*, on a row of its own, where the
+   stage gives it its whole width. That is the drop the phone layout already
+   uses, asked for by measurement rather than by a breakpoint, because what makes
+   a strip too wide is the words in it and not the window. Either way it is one
+   line, at full size, with nothing cut off and nothing covered. */
+#mechSystemPicker, #mechInstrumentPicker{
+  flex-wrap:nowrap; align-content:center;
+  height:34px; padding:2px;
+  max-width:var(--mech-strip-room, calc(100vw - 24px));
+  overflow-x:auto; overflow-y:hidden;
+}
+#mechSystemPicker::-webkit-scrollbar, #mechInstrumentPicker::-webkit-scrollbar{ display:none; }
+/* The row of its own, under the pill it opens out of *and* the one under that:
+   a strip that took the second pill's place would be a strip drawn over the
+   control that puts the instruments out. `--mech-shelf-drop` is the height of
+   the column below this launcher, measured in the page. */
+#mechSystemPicker.is-shelved, #mechInstrumentPicker.is-shelved{
+  top:var(--mech-shelf-drop, 82px); left:0;
+}
+/* And a stage that cannot hold the whole row even with a row of its own - a
+   laptop's, with the rail still standing beside it - gives up the glyphs rather
+   than the words: a reader picks a system by its name, and the little outline
+   beside it was only ever a second look at the same thing. Every name is still
+   on the strip, in one line, in the size the design asks for. */
+#mechSystemPicker.is-tight .shape-option svg,
+#mechInstrumentPicker.is-tight .shape-option svg{ display:none; }
+/* Seven names is a lot of words for one row, so each one gives back the padding
+   it does not need: a chip still reads as a chip, and the whole strip is a
+   little shorter than the sum of its parts. */
+#mechSystemPicker .shape-option{ min-width:46px; padding:0 6px; gap:5px; }
+/* And an open strip is *in front of* the far corner, not behind it. The two
+   corners are siblings and the right-hand one comes later in the document, so
+   without this the lab pill would paint across the end of the strip; a launcher
+   that is open is lifted above both, and its panel with it - a strip that a pill
+   on the far side of the stage is drawn through is a strip with a hole in it. */
+.shape-launcher.is-open{ z-index:3; }
+.shape-launcher.is-open .shape-picker{
+  opacity:1; visibility:visible; pointer-events:auto;
+}
+.shape-option{
+  display:inline-flex; align-items:center; gap:6px;
+  flex:0 0 auto; min-width:58px; height:32px; padding:0 9px;
+  border:0; border-radius:6px; background:transparent; color:var(--on-stage-2);
+  font:500 11px/1 var(--font); white-space:nowrap; cursor:pointer;
+  transition:background .14s ease, color .14s ease;
+}
+/* The glyph is the shape's own outline, one line weight lighter than the label
+   so the strip still reads as words at a glance and as shapes on a second look. */
+.shape-option svg{ flex:0 0 auto; opacity:.8; }
+.shape-option:hover,.shape-option:focus-visible{
+  background:var(--stage-2); color:var(--on-stage);
+}
+.shape-option:active{ background:var(--stage-line); }
+/* Something that is *on* says so in ink and nothing else: the accent on the
+   glyph. It is the only state this strip has, it costs the row no height and
+   no fill, and everything about the shape of the strip stays the strip the
+   shapes are picked with. */
+.shape-option.on{ color:var(--on-stage); }
+.shape-option.on .lucide{ color:var(--accent); }
+
+.sr-only{
+  position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important;
+  overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important;
+}
+@media (prefers-reduced-motion:reduce){
+  .shape-launcher *, .shape-launcher *::before, .shape-launcher *::after{ transition-duration:.01ms!important; animation-duration:.01ms!important; }
+}
+
+/* ------------------------------------- readouts ------------------------------------- */
+.readout{display:flex; align-items:baseline; justify-content:space-between; padding:10px 0;}
+.readout + .readout{border-top:1px solid var(--side-border);}
+.readout .rn{font-size:12.5px; color:var(--side-text-muted); font-weight:500;}
+.readout .rv{font-size:13.5px; font-weight:600; color:var(--side-text);}
+
+/* A vector is three rows of the same table a readout is: an axis letter on the
+   left, its number against the rail's right edge. The magnitude above it ends
+   on that same edge, so the whole block - magnitude and components alike -
+   reads as one column of numbers rather than a label with digits stuck to it. */
+.vec3{display:flex; flex-direction:column; gap:8px; padding:6px 0 2px;}
+.vec3-row{display:flex; align-items:baseline; gap:8px;}
+.vec3 .vk{
+  flex:0 0 auto; width:10px; color:var(--side-text-faint);
+  font-size:11px; font-weight:600; text-transform:uppercase;
+}
+.vec3 .vv{margin-left:auto; font-size:13.5px; font-weight:600; color:var(--side-text);}
+.picked-empty{font-size:12.5px; color:var(--side-text-faint); line-height:1.6; padding:6px 0;}
+.picked-id{
+  font-size:11px; font-weight:700; color:var(--accent-on-dark);
+  margin-bottom:12px; text-transform:uppercase; letter-spacing:.04em;
+}
+/* the traces sit on a hairline the way the readouts they belong to do, and
+   their fill is a whisper: on a dark rail a tenth of near-white is a slab,
+   not a trend, so it is barely more than the line's own weight. */
+.spark{
+  width:100%; height:34px; display:block;
+  margin:8px 0 2px;
+  border-bottom:1px solid var(--side-border);
+}
+
+/* ------------------------------------- page tab bar ------------------------------------- */
+.pagebar{
+  flex:0 0 auto; height:46px;
+  display:flex; align-items:center; gap:8px;
+  padding:0 20px;
+  background:var(--side-bg); border-top:1px solid var(--side-border);
+}
+.pagebar-tabs{ flex:0 1 auto; min-width:0; display:flex; align-items:center; gap:6px; overflow-x:auto; height:100%; }
+.pagebar-tabs::-webkit-scrollbar{ height:0; }
+.page-tab{
+  flex:0 0 auto; display:flex; align-items:center; gap:8px;
+  padding:7px 8px 7px 14px; border-radius:999px;
+  font-size:12.5px; font-weight:600; color:var(--side-text-muted);
+  background:transparent; border:1px solid transparent;
+  cursor:pointer; user-select:none;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.page-tab:hover{ background:var(--shell-2); }
+.page-tab.active{ background:var(--on-shell); color:var(--shell); font-weight:600; }
+.page-tab input{
+  border:none; outline:none; background:transparent;
+  font:inherit; color:inherit; width:auto; min-width:20px;
+}
+.page-tab .close-btn{
+  display:flex; align-items:center; justify-content:center;
+  width:18px; height:18px; border-radius:50%; border:none; background:transparent;
+  color:inherit; opacity:.5; cursor:pointer;
+}
+.page-tab .close-btn:hover{ opacity:1; background:rgba(128,128,140,0.20); }
+.page-tab .close-btn svg{ width:12px; height:12px; }
+.pagebar-add{
+  flex:0 0 auto; width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid var(--glass-idle-border); background:var(--glass-idle-bg);
+  box-shadow:var(--glass-idle-shadow); color:var(--side-text-muted);
+  cursor:pointer; transition:background .15s ease, color .15s ease;
+}
+.pagebar-add svg{ width:15px; height:15px; }
+.pagebar-add:hover{ background:var(--glass-active-bg); color:var(--side-text); border-color:var(--glass-active-border); box-shadow:var(--glass-active-shadow); }
+
+/* ------------------------------------- status bar ------------------------------------- */
+.statusbar{
+  height:36px; flex:0 0 auto;
+  border-top:1px solid var(--side-border); background:var(--side-bg);
+  display:flex; align-items:center; padding:0 24px; gap:24px;
+  font-size:11.5px; font-weight:600; color:var(--side-text-muted);
+}
+.statusbar b{color:var(--side-text); font-weight:700; font-variant-numeric:tabular-nums;}
+.statusbar .flex1{flex:1 1 auto;}
+.dot{width:6px; height:6px; border-radius:50%; background:var(--side-text-faint);}
+.dot.live{background:var(--accent); box-shadow:0 0 0 3px rgba(158,0,255,0.18);}
+
+/* ============================================================================
+   Responsive - the same elegance and every control still reachable at
+   every width; the dark panels stack below the viewport instead of
+   disappearing.
+   ============================================================================ */
+@media (max-width: 1100px){
+  .console{
+    width:100%; max-width:100%; min-width:0;
+    grid-template-columns:minmax(0, 1fr);
+    /* The stage's share of a short screen.
+
+       Half the viewport was the old number, and on a 700px-tall window that is a
+       350px stage - of which the launcher column takes 88 and the lab brief its
+       own 174, leaving the rig under a hundred pixels of glass to stand in. The
+       stage is what the page is for; the rails below it scroll, and they scroll
+       the same amount either way. Sixty-four per cent with the same 460px ceiling
+       keeps a workbench out of the way on a laptop and gives a short window back
+       the room its brief and its notices were eating. */
+    grid-template-rows:min(64vh, 460px) auto auto;
+    overflow-x:hidden; overflow-y:auto;
+  }
+  .rail{ min-width:0; width:100%; }
+  /* The stage leads the column.
+
+     The three children are written in document order rail, stage, rail, because
+     across three columns that is what they read as - left to right. Folded into
+     one column the same order buries the canvas under four hundred pixels of
+     sliders: a phone opens on a wall of controls with the thing they control
+     below the fold. The stage is the page, so it goes to the top, and the two
+     rails follow it - which is what the comment above always claimed happened
+     and what the grid, left to itself, quietly did not do. */
+  .console > .viewport{ order:-1; }
+  .titlebar,.pagebar,.statusbar{ width:100%; min-width:0; }
+  .titlebar{ padding:0 16px; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); gap:8px; }
+  .brand{ min-width:0; gap:6px; }
+  /* The wordmark gives way first: the back arrow beside it is a function and the
+     name is not, so on a narrow screen the name truncates rather than spilling
+     over the view toggle - which is what a nowrap line with no overflow rule
+     does to whatever sits next to it. */
+  .titlebar .brand .name{
+    min-width:0; font-size:clamp(12px, 3vw, 16.5px); white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;
+  }
+  .title-actions{ gap:2px; }
+  .title-actions .icon-btn{ width:30px; height:32px; }
+  .title-actions .run-btn{ gap:5px; padding:8px 11px; }
+  .console,.pagebar,.statusbar{ flex-shrink:0; }
+  .viewport{ min-height:320px; }
+}
+
+@media (max-width: 640px){
+  .titlebar{ padding:0 12px; height:60px; grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr); gap:3px; }
+  .brand .name{ font-size:clamp(11px, 3vw, 12.5px); }
+  .brand{ gap:2px; }
+  .brand .icon-btn{ width:25px; height:30px; flex:0 0 25px; }
+  .title-actions{ gap:0; }
+  .title-actions .icon-btn{ width:24px; height:30px; }
+  .title-actions .icon-btn svg{ width:13px; height:13px; }
+  .title-actions .run-btn{ gap:4px; font-size:10.5px; padding:7px 8px; }
+  .title-actions .run-btn svg{ width:13px; height:13px; }
+  .view-toggle button span{ display:none; }
+  .view-toggle button{ padding:8px; }
+  .rail-section{ padding:4px 16px 22px; }
+  .panel-title{ padding:18px 16px 10px; }
+  .btn-row{ flex-direction:column; }
+  .viewport-controls{ top:12px; left:12px; right:12px; gap:6px; }
+  /* A phone is too narrow for the strip to sit beside the pill without running
+     into the lab bench on the far side of the stage, so it drops to a row of
+     its own underneath, the way the lab menu already does. */
+  .shape-picker{ top:calc(100% + 6px); left:0; max-width:calc(100vw - 24px); }
+  .shape-option{ min-width:52px; padding:0 3px; }
+  /* The two strips that carry words rather than shapes are named by an id rule
+     above, so they need naming here as well: on a phone the row is a few dozen
+     pixels too long for the stage, and giving up the air around seven names
+     costs less than making the reader scroll a strip to reach the last one. */
+  #mechSystemPicker .shape-option, #mechInstrumentPicker .shape-option{
+    min-width:38px; padding:0 3px; gap:3px;
+  }
+  .pagebar{ padding:0 12px; }
+  .statusbar{ padding:0 16px; gap:16px; font-size:10.5px; overflow-x:auto; }
+}
+
+/* Narrower than the top bar can actually hold: two view buttons, six actions and
+   a Run do not fit beside a wordmark on a phone, and of the two the wordmark is
+   the one that does nothing. It stands down here rather than spilling over the
+   view toggle - the back arrow beside it stays, because that is a control. */
+/* The wordmark used to stand down at this width, because six actions and a Run
+   did not fit beside it on one line. The action row has a line of its own now, so
+   the name stays and truncates if it has to - see the phone title bar below. */
+
+/* ============================================================================
+   THE STAGE'S DRAWER FURNITURE
+   ============================================================================
+   The tab on the edge of the stage, and the scrim a drawer stands on. Both are
+   built by frontend/drawer.js and both are only furniture below the phone
+   breakpoint, where the rails stop being columns and slide over the stage
+   instead. On a wide screen they are in the document and not drawn, which is
+   cheaper than asking whether they should exist yet - and this block has to be
+   written *before* the phone block, or its own `display:none` would be the last
+   word on a rule the phone block is trying to say something else about. */
+.stage-peek{ display:none; }
+.drawer-scrim{ display:none; }
+
+/* ============================================================================
+   THE PHONE: THE STAGE, AND TWO DRAWERS
+   ============================================================================
+   A workbench is three things side by side - what you set up, what you watch,
+   and what it says - and three columns are the right shape for that on a desk
+   and the wrong shape on a phone, where the only thing worth the whole screen is
+   the stage.
+
+   So below this line the console is the stage and nothing else, the two rails
+   become drawers that slide over it, and a tab on each edge is their handle:
+   tap it and its drawer comes out, tap the stage behind it and it goes away.
+   The frontend/drawer.js module owns the state; this block owns the shape.
+
+   It comes last in the file on purpose. Everything here is a correction to a
+   rule above it for a narrower screen, and a correction that lost a tie to the
+   rule it corrects would be a rule that does nothing.
+   ============================================================================ */
+@media (max-width: 640px){
+  /* ------------------------------- the column ------------------------------- */
+  .console{
+    position:relative;
+    grid-template-columns:minmax(0, 1fr);
+    grid-template-rows:minmax(0, 1fr);
+    overflow:hidden;
+  }
+  .console > .viewport{ min-height:0; }
+  /* The brief and the stage's notices are children of the stage and stand in
+     its own flow, at the bottom, in the order they are read: what the experiment
+     asks of you, then what the bench has to say. The canvas is taken out of the
+     flow behind both - a flex column that still had a canvas in it would push
+     the brief off the bottom of the screen, which is exactly where these were
+     landing before. */
+  .viewport{
+    display:flex; flex-direction:column; justify-content:flex-end;
+    gap:8px; padding:0 12px 12px;
+  }
+  .viewport > canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  .viewport > .lab-card,
+  .viewport > .stage-notices,
+  .viewport > .session-note{
+    position:relative; inset:auto; width:auto; max-width:none;
+    max-height:min(40%, 240px); overflow-y:auto; overscroll-behavior:contain;
+  }
+  .viewport > .stage-notices,
+  .viewport > .session-note{ max-height:none; }
+  .viewport > .lab-card{ order:1; }
+  .viewport > .stage-notices,
+  .viewport > .session-note{ order:2; }
+  .stage-notices{
+    flex-direction:column; flex-wrap:nowrap; justify-content:flex-start;
+    align-items:stretch;
+  }
+
+  /* ------------------------------- the drawers ------------------------------- */
+  .rail{
+    position:absolute; top:0; bottom:0; left:0; z-index:22;
+    width:min(86%, 340px); height:auto; min-height:0;
+    border:0; border-right:1px solid var(--shell-line);
+    box-shadow:0 18px 44px rgba(35,35,43,.34);
+    transform:translateX(-102%);
+    transition:transform .24s cubic-bezier(.2,.7,.3,1);
+    overscroll-behavior:contain;
+  }
+  .rail.right{
+    left:auto; right:0;
+    border-right:0; border-left:1px solid var(--shell-line);
+    box-shadow:0 -18px 44px rgba(35,35,43,.34);
+    transform:translateX(102%);
+  }
+  .rail.is-open{ transform:none; }
+
+  .drawer-scrim{
+    display:block; position:absolute; inset:0; z-index:20;
+    background:rgba(35,35,43,.36);
+    opacity:0; pointer-events:none;
+    transition:opacity .24s ease;
+  }
+  .console.drawer-open .drawer-scrim{ opacity:1; pointer-events:auto; }
+
+  /* The handle. A tab on the edge of the stage, drawn the way a drawer's handle
+     is: a little proud of the edge, with the name of what is behind it written
+     down its length. `top:50%` is the middle of the stage, which is where a hand
+     holding a phone can reach it without moving. */
+  .stage-peek{
+    display:flex; flex-direction:column; align-items:center; gap:9px;
+    position:absolute; top:50%; z-index:24;
+    transform:translateY(-50%);
+    width:27px; padding:12px 0;
+    border:0; cursor:pointer;
+    background:#f4f3f8eb; color:var(--on-stage-2);
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+    font:600 9px/1 var(--font); letter-spacing:.15em; text-transform:uppercase;
+    transition:background .16s ease, color .16s ease;
+  }
+  .stage-peek:hover, .stage-peek:focus-visible{ background:var(--surface); color:var(--on-stage); }
+  .stage-peek svg{ width:13px; height:13px; }
+  .stage-peek-label{ writing-mode:vertical-rl; text-orientation:mixed; }
+  .peek-left{ left:0; border-radius:0 11px 11px 0; box-shadow:2px 0 12px rgba(52,52,63,.13); }
+  .peek-right{ right:0; border-radius:11px 0 0 11px; box-shadow:-2px 0 12px rgba(52,52,63,.13); }
+  /* The open drawer's own handle goes away - it is holding the drawer now - and
+     the other one stays, because from inside one drawer the way to the other
+     should be one press and not two. */
+  .stage-peek.is-open{ opacity:0; pointer-events:none; }
+}
+
+/* ============================================================================
+   THE PHONE'S TITLE BAR
+   ============================================================================
+   Six actions, a view toggle and a Run do not fit beside a wordmark on a phone,
+   and squeezing them into one line is what made the bar read as broken: 24px
+   targets, no air between them, and an active view button whose pill was wider
+   than the well it sat in. So the bar becomes two rows at this width - what the
+   bar is for on top (where you are, which view, and Run), and the row of smaller
+   actions under it, each one big enough to hit.
+   ============================================================================ */
+@media (max-width: 640px){
+  .titlebar{
+    display:flex; flex-wrap:wrap; align-items:center;
+    justify-content:space-between; gap:6px 8px;
+    height:auto; min-height:56px; padding:7px 12px;
+  }
+  .brand{ order:1; flex:0 1 auto; min-width:0; }
+  /* The toggle keeps its words here rather than dropping to a glyph. A cube and
+     an empty square are not a pair anybody can read at a glance, and there is
+     room for the two labels once the action row has moved to its own line. */
+  .view-toggle{ order:2; }
+  .view-toggle button{ padding:7px 13px; }
+  .view-toggle button span{ display:inline; }
+  .title-actions{
+    order:3; flex:1 1 100%;
+    justify-content:space-between; gap:2px;
+    padding-top:2px; border-top:1px solid var(--shell-line);
+  }
+  .title-actions .icon-btn{ width:40px; height:38px; }
+  .title-actions .icon-btn svg{ width:16px; height:16px; }
+  .title-actions .run-btn{ gap:6px; font-size:12px; padding:9px 15px; }
+  .title-actions .run-btn svg{ width:14px; height:14px; }
+}
+
+/* ============================================================================
+   HOMEPAGE - Spline-tutorial-style hero: split light/grey backdrop, giant
+   tight headline, half-donut glass tube with glowing marbles. The visual
+   container's own background IS the split - its center is the tube's
+   center, so the divider always passes through the tube.
+   ============================================================================ */
+/* The colours (--home-bg-*, --home-ink*, --home-violet) live in the palette
+   at the top of this file, shared with the workbench; only the hero's own
+   measurements belong here. */
+:root{
+  --home-split:    62.06;                 /* the split, in vw - the channel's centre */
+  --home-fs:       clamp(29px, 3.4vw, 65px);  /* headline size; everything scales off it */
+  --home-gutter:   3.14vw;               /* 60px at 1911px wide */
+}
+
+html, body{ height:auto; overflow:visible; }
+#home{ overflow:hidden; }
+/* Set by the inline route check in index.html's <head>, so a refresh on
+   /dynamics never paints the homepage - not even for one frame. home.js keeps
+   the class in step for in-page navigation. */
+html.route-workbench #home{ display:none; }
+
+/* Every number below is measured off the reference: the split sits at
+   62.06vw (and runs through the channel's centre), the headline's cap line
+   at 35.35vh on a 70px rhythm, the pill 54px tall at 53.7vh, the
+   WORKBENCH / description pair at 66vh, all left-aligned on 60px. */
+.home{
+  position:relative;
+  height:100vh;
+  background:var(--home-bg-left);
+  color:var(--home-ink);
+  font-family:var(--font);
+}
+.home[hidden]{ display:none; }
+
+/* the full-height grey panel - the divider always passes through the tube */
+.home::before{
+  content:"";
+  position:absolute; top:0; right:0; bottom:0;
+  width:calc((100 - var(--home-split)) * 1vw);
+  background:var(--home-bg-right);
+}
+
+.home-nav{ position:absolute; top:0; left:0; display:flex; padding:calc(3.6vh - 0.106vw) 0 0 var(--home-gutter); }
+.home-wordmark{
+  font-size:clamp(15px, 0.995vw, 19px); line-height:1;
+  font-weight:500; letter-spacing:-0.005em; color:var(--home-ink);
+}
+.home-wordmark b{ font-weight:700; }
+
+.home-hero-copy{ position:absolute; inset:0; }
+.home-headline{
+  position:absolute; left:var(--home-gutter);
+  /* cap line, not box line: at this line-height Inter's cap sits 0.175em
+     below the box top */
+  top:calc(35.35vh - 0.175 * var(--home-fs));
+  margin:0; white-space:nowrap;
+  font-size:var(--home-fs); font-weight:700; line-height:1.077;
+  letter-spacing:-0.02em; color:var(--home-ink);
+}
+.home-headline .accent{ color:var(--home-violet); }
+
+.home-cta{
+  position:absolute; left:var(--home-gutter); top:53.7vh;
+  display:inline-flex; align-items:center; justify-content:center;
+  height:calc(.831 * var(--home-fs)); padding:0 2.31em;
+  font-family:var(--font); font-size:calc(.2308 * var(--home-fs)); font-weight:600;
+  letter-spacing:-0.01em; color:#fff; background:var(--home-ink);
+  border:0; border-radius:999px;
+  cursor:pointer; transition:background .2s ease, transform .1s ease;
+}
+.home-cta:hover{ background:var(--home-violet); }
+.home-cta:active{ transform:scale(.98); }
+
+.home-foot{ position:absolute; left:var(--home-gutter); top:calc(66vh - 0.0215 * var(--home-fs)); }
+.home-eyebrow{
+  font-size:calc(.178 * var(--home-fs)); line-height:1;
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--home-ink-2);
+}
+.home-desc{
+  /* the subtracted term is the description's own size again: it cancels the
+     half-leading and the descender space, so the gap between the eyebrow and
+     the line stays the same however big the type gets */
+  margin:calc(2.9vh - 0.24 * var(--home-fs)) 0 0;
+  font-size:calc(.24 * var(--home-fs)); line-height:1.35; letter-spacing:-0.005em;
+  color:var(--home-ink-2); white-space:nowrap;
+}
+
+/* ---------------------------- the channel ---------------------------- */
+/* The visual container is a full-bleed overlay that sits on top of the copy,
+   so it must never take a click: the tube is decoration, and `Try it` lives
+   underneath it. */
+/* The canvas is the reference frame (854 × 622 reference units, of which the
+   tube's outer wall is 761 wide) with its bend centre on the 62.06vw /
+   39.1vh intersection - 48.548% across and 37.942% down the box. */
+.home-hero-visual{ position:absolute; inset:0; pointer-events:none; }
+.tube-stage{
+  position:absolute;
+  left:calc(var(--home-split) * 1vw); top:39.1vh;
+  width:min(47.2vw, 94.1vh);
+  transform:translate(-48.548%, -37.942%);
+}
+.tube-canvas{ display:block; width:100%; height:auto; aspect-ratio:854 / 622; }
+
+/* ============================================================================
+   TOPIC PICKER - a sheet of the page's own light, four rows on it
+   ============================================================================
+   Everything here is built out of the homepage's own palette: the flat panel
+   greys, ink at three weights, Inter, and violet used exactly once - on the
+   one row that opens. No per-topic colour, no icons standing in for ideas. */
+.modal-backdrop{
+  position:fixed; inset:0; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  padding:24px;
+  /* the page recedes into a wash of its own background rather than a dark
+     scrim, so the picker still reads as part of the homepage */
+  background:rgba(211,210,221,0.68);
+  backdrop-filter:blur(40px) saturate(0.88); -webkit-backdrop-filter:blur(40px) saturate(0.88);
+  opacity:0; visibility:hidden;
+  transition:opacity .3s ease, visibility 0s linear .3s;
+}
+.modal-backdrop.open{
+  opacity:1; visibility:visible;
+  transition:opacity .3s ease, visibility 0s linear 0s;
+}
+
+/* the sheet: a lighter slab than either panel, so it reads as a piece of the
+   page lifted off it - a hairline rather than a border, and one soft shadow */
+.modal-card{
+  width:100%; max-width:540px; padding:24px 20px 20px;
+  border-radius:26px;
+  background:rgba(244,243,248,0.92);
+  color:var(--home-ink);
+  box-shadow:
+    inset 0 0 0 1px rgba(52,52,63,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    0 40px 80px -40px rgba(52,52,63,0.5);
+  transition:transform .42s cubic-bezier(.22,1,.36,1);
+}
+/* The closed state is the offset one, never the open one, so a browser that
+   refuses to animate still shows a modal in the right place. */
+.modal-backdrop:not(.open) .modal-card{ transform:translateY(16px) scale(.98); }
+
+.topic-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:4px 6px 20px; }
+.topic-eyebrow{
+  font-size:11.5px; line-height:1; font-weight:600; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--home-ink-3);
+}
+.topic-sub{ margin:12px 0 0; font-size:15px; line-height:1.45; letter-spacing:-0.005em; color:var(--home-ink-2); }
+
+.icon-btn-light{
+  flex:0 0 auto;
+  width:34px; height:34px; border-radius:50%; border:none;
+  background:rgba(52,52,63,0.05); color:var(--home-ink-3);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  transition:background .18s ease, color .18s ease, transform .28s ease;
+}
+.icon-btn-light:hover{ background:rgba(52,52,63,0.1); color:var(--home-ink); transform:rotate(90deg); }
+.icon-btn-light svg{ width:15px; height:15px; }
+
+/* the rows: one column, one surface each, numbered so they read as a list */
+.topic-list{ display:flex; flex-direction:column; gap:8px; }
+.topic-row{
+  display:flex; align-items:center; gap:16px; width:100%;
+  padding:16px 18px; border:none; border-radius:17px;
+  text-align:left; font-family:var(--font); cursor:pointer;
+  background:rgba(255,255,255,0.55);
+  box-shadow:inset 0 0 0 1px rgba(52,52,63,0.07);
+  opacity:1;
+  transition:opacity .2s ease, transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+/* the rows rise in, one behind the other. The stagger lives on the open
+   state, so closing is not held up by it - and the hidden state is the
+   closed one, so the rows can never be left invisible by a skipped frame. */
+.modal-backdrop:not(.open) .topic-row{ opacity:0; transform:translateY(9px); }
+.modal-backdrop.open .topic-row{
+  transition:
+    opacity .5s ease calc(var(--i) * 55ms + 70ms),
+    transform .55s cubic-bezier(.22,1,.36,1) calc(var(--i) * 55ms + 70ms),
+    background .2s ease, box-shadow .2s ease;
+}
+
+.topic-index{
+  flex:0 0 auto; font-size:11px; font-weight:600; letter-spacing:.08em;
+  font-variant-numeric:tabular-nums; color:var(--home-ink-3);
+  transition:color .2s ease;
+}
+.topic-body{ display:flex; flex-direction:column; gap:5px; flex:1 1 auto; min-width:0; }
+.topic-name{ font-size:17px; font-weight:600; line-height:1.15; letter-spacing:-0.015em; color:var(--home-ink); }
+.topic-desc{ font-size:14px; line-height:1.45; letter-spacing:-0.005em; color:var(--home-ink-2); }
+.topic-go{
+  flex:0 0 auto; display:flex; color:var(--home-ink-3);
+  transition:color .2s ease, transform .3s cubic-bezier(.22,1,.36,1);
+}
+.topic-go svg{ display:block; width:16px; height:16px; }
+
+.topic-row:not(:disabled):hover{
+  background:rgba(255,255,255,0.95);
+  box-shadow:
+    inset 0 0 0 1px rgba(52,52,63,0.14),
+    0 14px 28px -20px rgba(52,52,63,0.55);
+}
+.topic-row:not(:disabled):hover .topic-index,
+.topic-row:not(:disabled):hover .topic-go{ color:var(--home-violet); }
+.topic-row:not(:disabled):hover .topic-go{ transform:translateX(3px); }
+.topic-row:not(:disabled):active{ background:rgba(255,255,255,0.8); }
+.topic-row:focus-visible{ outline:none; box-shadow:inset 0 0 0 1.5px var(--home-violet); }
+
+.topic-row:disabled{
+  cursor:default;
+  background:rgba(255,255,255,0.3);
+  box-shadow:inset 0 0 0 1px rgba(52,52,63,0.05);
+}
+.topic-row:disabled .topic-name{ color:color-mix(in srgb, var(--home-ink) 58%, transparent); }
+.topic-row:disabled .topic-desc{ color:color-mix(in srgb, var(--home-ink-2) 62%, transparent); }
+.topic-row:disabled .topic-index{ color:color-mix(in srgb, var(--home-ink-3) 70%, transparent); }
+.topic-soon{
+  flex:0 0 auto;
+  font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--home-ink-3); background:rgba(52,52,63,0.055);
+  border-radius:999px; padding:5px 9px;
+}
+
+/* ---------------------------- homepage responsive ---------------------------- */
+/* under 1100px the absolute stage stops making sense: the copy goes back
+   into normal flow and the channel sits below it, still on the split. */
+@media (max-width: 1100px){
+  :root{ --home-fs:clamp(32px, 7vw, 58px); --home-gutter:36px; }
+  .home{ height:auto; min-height:100vh; padding-bottom:8vh; }
+  /* the tube is centred on the viewport here, so the split meets it there too */
+  .home::before{ width:50%; }
+  .home-nav{ padding:26px 0 0 var(--home-gutter); }
+  /* the tube leads, the copy follows it - and the tube is sized off the
+     viewport's height so it can never run off the bottom */
+  .home-hero{ display:flex; flex-direction:column; }
+  .home-hero-visual{ position:relative; inset:auto; order:-1; padding-top:6vh; }
+  /* centred on the split, not on the box: the bend centre rides the seam */
+  .tube-stage{ position:relative; left:50%; top:auto; width:min(88vw, 58vh); transform:translate(-48.548%, 0); }
+  .home-hero-copy{ position:relative; inset:auto; padding:4vh var(--home-gutter) 0; }
+  .home-headline,
+  .home-cta,
+  .home-foot{ position:relative; left:auto; top:auto; }
+  .home-headline{ white-space:normal; }
+  .home-cta{ margin-top:calc(.62 * var(--home-fs)); }
+  .home-foot{ margin-top:calc(.9 * var(--home-fs)); }
+  .home-desc{ margin-top:calc(.34 * var(--home-fs)); white-space:normal; }
+}
+@media (max-width: 560px){
+  :root{ --home-fs:clamp(30px, 9.4vw, 46px); --home-gutter:20px; }
+  .home-nav{ padding:20px 0 0 var(--home-gutter); }
+  /* Not `98vw`: the bend centre sits 48.548% across the canvas and the stage is
+     translated by that much to put it on the seam, which leaves 51.452% of the
+     tube hanging to the right of it. At 98vw that tail reaches half a percent
+     past the right edge of the viewport, and `#home`'s own `overflow:hidden`
+     shaved it off rather than let it scroll. 94vw is the largest step that
+     clears the edge with room for the scrollbar a phone sometimes has. */
+  .tube-stage{ width:min(94vw, 52vh); }
+  .modal-backdrop{ padding:14px; }
+  .modal-card{ padding:20px 14px 14px; border-radius:22px; }
+  .topic-head{ padding:2px 4px 16px; }
+  .topic-row{ padding:14px 15px; gap:13px; }
+}
+
+/* Once the workbench is open, it owns the whole viewport like before */
+.app-shell{ height:100vh; display:flex; flex-direction:column; }
+.app-shell[hidden]{ display:none; }
+/* laid out, but not painted: the window between "the shell is on screen" and
+   "main.js has finished building it" */
+.app-shell.booting{ visibility:hidden; }
+
+/* ============================ LAB BENCH + INSTRUMENTS ============================ */
+/* Everything the workbench gained to be usable as a lab bench rather than a
+   toy: an experiment menu, a brief that stays on the stage while you work, the
+   rulers the 2D view is measured against, and the energy chart. Same palette,
+   same hairlines, same one accent - they are instruments on the same bench, not
+   a second interface. */
+
+/* One light pill per launcher, one launcher per corner of the stage: shapes to
+   build with on the left, the lab bench on the right. */
+.stage-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  height:34px; padding:0 13px;
+  border:1px solid var(--border); border-radius:var(--radius-pill);
+  background:#f4f3f8eb; color:var(--on-stage-2);
+  font:500 11px/1 var(--font); cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+.stage-pill svg{ width:13px; height:13px; }
+.stage-pill:hover{ background:var(--surface); color:var(--on-stage); }
+.stage-pill:focus-visible{ outline:2px solid var(--stage-line); outline-offset:1px; }
+
+/*
+   The right corner is a column: the lab bench at the top of the stage, and
+   under it the two buttons that do with a press what the wheel and the pinch
+   already do. Under the bench rather than beside it, because that top row is
+   two launchers and a third pill in it would read as a third thing to launch.
+
+   Two buttons in one well, and the same two in the same order as a map's own
+   zoom: the one place a reader looks for them. The well is the shape-picker's
+   rectangle rather than the launcher's pill, because a divider across a pill
+   lands on its curve and stops reading as a divider.
+*/
+.stage-corner{
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+  /* The corner is a column of controls, not a surface: the stage underneath it
+     keeps every pixel that is not a button. */
+  pointer-events:none;
+}
+.stage-corner > *{ pointer-events:auto; }
+.stage-zoom{
+  display:flex; flex-direction:column; overflow:hidden;
+  border:1px solid var(--border); border-radius:var(--radius-sm);
+  background:#f4f3f8eb;
+}
+.stage-zoom-btn{
+  display:flex; align-items:center; justify-content:center;
+  width:36px; height:32px; padding:0; border:0; background:transparent;
+  color:var(--on-stage-2); cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+.stage-zoom-btn svg{ width:14px; height:14px; }
+.stage-zoom-btn + .stage-zoom-btn{ border-top:1px solid var(--border); }
+.stage-zoom-btn:hover{ background:var(--surface); color:var(--on-stage); }
+.stage-zoom-btn:active{ background:var(--stage-2); }
+.stage-zoom-btn:focus-visible{ outline:2px solid var(--stage-line); outline-offset:-2px; }
+
+/* The lab menu: a list, not a strip, because an experiment is chosen by what it
+   asks rather than by its name, so each row carries its own question. */
+.lab-launcher{ position:relative; }
+.lab-picker{
+  position:absolute; top:calc(100% + 6px); right:0;
+  width:min(300px, calc(100vw - 48px)); max-height:min(58vh, 440px);
+  overflow-y:auto; overscroll-behavior-y:contain;
+  padding:6px; border:1px solid var(--border); border-radius:var(--radius-md);
+  background:var(--surface); box-shadow:var(--shadow-2);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .14s ease, visibility .14s ease;
+}
+.lab-picker::-webkit-scrollbar{ width:8px; }
+.lab-picker::-webkit-scrollbar-thumb{ background:var(--stage-line); border-radius:4px; }
+.lab-launcher.is-open .lab-picker{ opacity:1; visibility:visible; pointer-events:auto; }
+.lab-row{
+  display:block; width:100%; text-align:left; padding:9px 11px;
+  border:0; border-radius:var(--radius-sm); background:transparent; cursor:pointer;
+  transition:background .14s ease;
+}
+.lab-row:hover{ background:var(--stage-2); }
+.lab-row:focus-visible{ outline:2px solid var(--stage-line); outline-offset:-2px; }
+.lab-row.on{ background:var(--stage-2); box-shadow:inset 0 0 0 1px var(--stage-line); }
+.lab-row-name{ display:block; font:600 12.5px/1.3 var(--font); color:var(--on-stage); }
+.lab-row-aim{ display:block; margin-top:3px; font:400 11px/1.4 var(--font); color:var(--on-stage-3); }
+
+/* The brief, pinned to the bottom-left of the stage: the question stays where
+   the evidence is, instead of scrolling out of the rail above it. */
+.lab-card{
+  position:absolute; left:22px; bottom:22px; z-index:11;
+  width:min(340px, calc(100% - 44px));
+  padding:13px 15px 15px;
+  border:1px solid var(--border); border-radius:var(--radius-md);
+  background:#f4f3f8f0; color:var(--on-stage);
+  box-shadow:var(--shadow-1);
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  font-family:var(--font);
+}
+.lab-card.is-hidden{ display:none; }
+
+/* The session notice: the scene on screen was built on an earlier visit. It
+   sits bottom-right, opposite the lab brief, so the two can never stack up. */
+.session-note{
+  position:absolute; right:22px; bottom:22px; z-index:11;
+  display:flex; align-items:center; gap:10px;
+  max-width:min(360px, calc(100% - 44px));
+  padding:7px 8px 7px 14px;
+  border:1px solid var(--border); border-radius:var(--radius-pill);
+  background:#f4f3f8f0; color:var(--on-stage-2);
+  box-shadow:var(--shadow-1);
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  font-family:var(--font); font-size:11.5px; line-height:1.35;
+}
+.session-note.is-hidden{ display:none; }
+.session-note-btn{
+  flex:0 0 auto; padding:6px 12px; border:0; border-radius:var(--radius-pill);
+  background:var(--on-stage); color:var(--surface);
+  font:600 11px/1 var(--font); cursor:pointer;
+  transition:background .14s ease, color .14s ease;
+}
+.session-note-btn:hover{ background:var(--accent); color:#fff; }
+.session-note-close{
+  flex:0 0 auto; width:22px; height:22px; padding:0; border:0; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; color:var(--on-stage-3); cursor:pointer;
+  transition:background .14s ease, color .14s ease;
+}
+.session-note-close svg{ width:12px; height:12px; }
+.session-note-close:hover{ background:#34343f14; color:var(--on-stage); }
+.lab-card-head{ display:flex; align-items:center; gap:8px; }
+/* The name carries the accent the word "Lab" used to: on a card that says what
+   the experiment is, the experiment's name is the label. */
+.lab-card-name{ font-size:13px; font-weight:700; letter-spacing:-.01em; color:var(--accent); }
+.lab-card-close{
+  margin-left:auto; width:22px; height:22px; padding:0;
+  border:0; border-radius:50%; background:transparent;
+  color:var(--on-stage-3); font-size:15px; line-height:1; cursor:pointer;
+  transition:background .14s ease, color .14s ease;
+}
+.lab-card-close:hover{ background:var(--stage-2); color:var(--on-stage); }
+.lab-card-aim{ margin-top:8px; font-size:12px; line-height:1.45; color:var(--on-stage-2); }
+.lab-card-asks{ margin:9px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; }
+/* What the lab put on the bench, in the numbers its panels are set to: the one
+   line here that is about the setup rather than about the question, and it stands
+   under the aim because it is what the aim is measured against. No rule down its
+   side: a hairline beside a paragraph of prose is a mark with nothing to divide,
+   and two lines of it read as a quotation rather than as part of the brief. */
+.lab-card-setup{
+  margin:9px 0 0;
+  font-size:11px; line-height:1.45; color:var(--on-stage-3);
+}
+.lab-card-setup.is-hidden{ display:none; }
+/* The one line about time rather than about the experiment: how long the scene
+   is worth watching before its numbers mean anything. */
+.lab-card-hold{ margin:10px 0 0; font-size:11px; color:var(--on-stage-3); }
+.lab-card-hold.is-hidden{ display:none; }
+.lab-card-asks li{
+  position:relative; padding-left:14px;
+  font-size:11.5px; line-height:1.45; color:var(--on-stage-3);
+}
+.lab-card-asks li:before{
+  content:""; position:absolute; left:0; top:5.5px;
+  width:5px; height:5px; border-radius:50%; background:var(--stage-line);
+}
+
+/* The resize grips: a plus on every corner of the selected shape. They are
+   elements over the stage rather than meshes in it for three reasons - they keep
+   one size while the shape does not, they can wear a cursor, and a press on one
+   never reaches the canvas underneath. The layer itself is inert; only the grips
+   are pressable, so the stage is still the stage everywhere else. */
+.resize-handles{ position:absolute; inset:0; z-index:10; pointer-events:none; }
+.resize-handles.is-hidden{ display:none; }
+.resize-handle{
+  position:absolute; width:13px; height:13px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:var(--surface);
+  box-shadow:0 0 0 1.5px var(--accent), 0 1px 3px rgba(52,52,63,0.22);
+  pointer-events:auto;
+  /* A grip is dragged, never scrolled: without this a touch screen would read
+     the start of a pull as the start of a page pan. */
+  touch-action:none;
+  transition:background .12s ease, box-shadow .12s ease;
+}
+/* The plus is two hairlines, not a glyph: crisp at any size, and it can take the
+   accent without a second colour having to sit on the white with it. */
+.resize-handle:before,.resize-handle:after{
+  content:""; position:absolute; left:50%; top:50%;
+  background:var(--accent); border-radius:1px;
+  transform:translate(-50%,-50%);
+}
+.resize-handle:before{ width:7px; height:1.5px; }
+.resize-handle:after{ width:1.5px; height:7px; }
+/* The grip in hand inverts, so the one being pulled is the one that says so. */
+.resize-handle:hover,.resize-handle:active{ background:var(--accent); }
+.resize-handle:hover:before,.resize-handle:hover:after,
+.resize-handle:active:before,.resize-handle:active:after{ background:var(--surface); }
+
+/* On the Vibrations bench a grip is not drawn at all. The picked part wears an
+   outline of its own in the scene, ruled round it in the accent by the renderer,
+   and a grip is simply one corner of that outline: a mark pushed on top of it
+   would be a second, flatter box drawn over the real one. It shows itself only
+   under the hand - a violet edge as the pointer comes near it, filled while it
+   is pulled - so the picture says what the picture says, and the corner is still
+   there to be taken hold of. Only this bench: the grip itself is shared with the
+   Dynamics one. */
+#mechViewport .resize-handle{
+  width:12px; height:12px;
+  border-radius:2px;
+  background:transparent;
+  border:1.5px solid transparent;
+  box-shadow:none;
+}
+#mechViewport .resize-handle:before,
+#mechViewport .resize-handle:after{ content:none; }
+#mechViewport .resize-handle:hover,
+#mechViewport .resize-handle:active{
+  border-color:var(--accent);
+  background:rgba(158,0,255,0.16);
+}
+
+/* The rulers. Only the 2D view shows them, and only the 2D view can: it is the
+   one view where one world metre is one fixed number of pixels. */
+.stage-rules{ position:absolute; inset:0; z-index:10; pointer-events:none; font-family:var(--font); }
+.stage-rules.is-hidden{ display:none; }
+.rule{ position:absolute; }
+.rule-height{ left:0; top:0; bottom:0; width:48px; border-right:1px solid var(--stage-line); }
+.rule-height .tick{ position:absolute; right:0; width:8px; height:1px; background:var(--stage-line); }
+.rule-height .tick-minor{ width:4px; }
+.rule-height .tick-zero{ background:var(--on-stage-3); }
+.rule-height .tick-label{
+  position:absolute; right:12px; top:0; transform:translateY(-50%);
+  font-size:10px; font-weight:600; font-variant-numeric:tabular-nums;
+  white-space:nowrap; color:var(--on-stage-3);
+}
+.rule-height .tick-zero .tick-label{ color:var(--on-stage-2); }
+.rule-distance{ left:0; right:0; bottom:0; height:30px; border-top:1px solid var(--stage-line); }
+.rule-distance .tick{ position:absolute; top:0; width:1px; height:7px; background:var(--stage-line); }
+.rule-distance .tick-label{
+  position:absolute; left:50%; top:9px; transform:translateX(-50%);
+  font-size:10px; font-weight:600; font-variant-numeric:tabular-nums;
+  white-space:nowrap; color:var(--on-stage-3);
+}
+
+/* The energy chart. Three traces, one scale, told apart by weight like every
+   other pair of lines in the rail. */
+.chart{ width:100%; height:64px; display:block; margin:11px 0 0; border-bottom:1px solid var(--side-border); }
+.chart-legend{ display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 2px; font-size:10.5px; color:var(--side-text-muted); }
+.chart-key{ display:inline-flex; align-items:center; gap:5px; }
+.chart-key .swatch{ width:10px; height:2px; border-radius:1px; }
+/* The momentum vector reads as one block of three components, hung off the
+   magnitude above it as one column of numbers. */
+/* Measurements inside the editor are a table, not a stack of settings: tighter
+   rows, so a dozen of them do not push the experiment off the panel. */
+.transform-group .readout{ padding:7px 0; }
+
+/* ================================ THERMO PANELS ================================ */
+/* The Thermo rail is the same furniture as the Dynamics one and adds three
+   things: a readout that may carry one comparison underneath it, a chart on the
+   rail's own surface, and an energy ledger drawn as bars. Same hairlines, same
+   one accent. */
+
+/* The Thermo rails are the Dynamics rails: same panel titles, same section
+   padding, same 11px between controls, same 6px from a caption's row to the
+   control under it, same 40px switch row, same 10px readout. Two workbenches in one app are two
+   views of one instrument, and an instrument whose rows move when you switch
+   benches is telling the reader that it has changed when it has not. So there
+   is deliberately no rhythm of its own here - only the four things this panel
+   has that the other one does not. */
+/* A segmented control's caption is a sibling of the bar here rather than a row
+   above it, so it has to be given the air `.ctrl-row` would have carried -
+   without it the bar sits on top of the words that name it.
+
+   Ten pixels, and the number that matters is the one under it: a caption stands
+   10px off the control it names and a control stands 20px off the next caption
+   down the rail, so the bar is always visibly nearer its own name than it is to
+   the next one. That is the whole of what tells a reader which caption goes with
+   which control, and at 6 against 11 it was doing it badly: two short gaps that
+   differ by five pixels read as one column of evenly spaced things. */
+:is(#thermo, #mech) .ctrl > .ctrl-label + .seg{ margin-top:10px; }
+/* A picker that is a group of its own - the gas, the second gas - stands 20px
+   off whatever is under it rather than the 11px that holds one list together.
+   The two gas pickers are two separate choices about the box (what is in it, and
+   whether anything else is), not two rows of one list. */
+:is(#thermo, #mech) .ctrl.seg-wide{ margin-bottom:20px; }
+/* A control that ends a group takes a group's air under it instead of the 11px
+   one row of a list stands off the row under it. What holds the lid is the last
+   thing this group says about the lid; the pinhole under it is the next subject,
+   and two subjects are not two rows. Resolution ends the timeline the same way,
+   with the three readings about the gas's clock under it.
+
+   The number is between the two: more than the 11px that holds a list together
+   and more than the 20px a picker takes, less than the 16 + 1 + 10 + 16px that
+   holds two headings apart, because this is the end of a group inside one
+   heading rather than a new heading. */
+:is(#thermo, #mech) .ctrl.group-end{ margin-bottom:30px; }
+/* A control whose subject is switched off reads as switched off, rather than as
+   a live drag that quietly does nothing. */
+:is(#thermo, #mech) .ctrl.is-disabled{ opacity:.42; }
+:is(#thermo, #mech) .ctrl.is-disabled .ctrl-val{ pointer-events:none; }
+:is(#thermo, #mech) .ctrl.is-disabled input[type="range"]{ cursor:default; }
+/* The two actions under the P-V chart stand off the chart the way the first
+   row of buttons on the other rail stands off the slider above it. */
+:is(#thermo, #mech) .plot-actions{ margin-top:16px; }
+
+/* The stage carries the same two launchers, in the same two corners, as the
+   other bench: instruments to put on the stage on the left, the lab bench on
+   the right. Nothing here overrides `.viewport-controls`, because there is
+   nothing left to override - the shapes are called instruments and they are
+   where the shapes are. */
+#thermoCanvas{ width:100%; height:100%; display:block; cursor:grab; }
+#thermoCanvas:active{ cursor:grabbing; }
+/* The lid is grabbable only while a hand holds it, and the cursor says which
+   press is which: a press on the lid moves the lid, a press anywhere else turns
+   the box. */
+#thermoCanvas.lid-hover{ cursor:ew-resize; }
+#thermoCanvas.lid-dragging, #thermoCanvas.lid-dragging:active{ cursor:ew-resize; }
+/* An instrument that would open its settings when it is clicked: the cursor says
+   so before the press is committed to it, the way it does over a shape. */
+#thermoCanvas.instrument-hover{ cursor:pointer; }
+
+.muted{ color:var(--side-text-muted); }
+
+/* One line in a rail that is a *result* rather than an explanation - the
+   exponent of a squeeze. Nothing else on the rails is prose. */
+.rail-note{ margin:10px 0 2px; font-size:11px; line-height:1.5; color:var(--side-text-muted); }
+.rail-note:empty{ display:none; }
+
+/* Five gases in one row: without a nudge the names would wrap and the picker
+   would be two lines tall. The symbols are what the reader is picking by, and
+   the full name is one hover away. */
+.seg-wide .seg button{ padding:8px 4px; font-size:11px; letter-spacing:0; }
+
+/* The strip in the corner is the shape launcher's own strip, and the one thing
+   it has to say is said in ink rather than with a background: an instrument
+   that is on the stage carries the accent on its glyph, which is what the
+   accent means everywhere else on this stage.
+
+   Nothing else marks anything. A row of words where one of them sits in a
+   filled recess, or wears a rule under it, is a second kind of button in a
+   strip that has nothing else of the sort in it, and which of them the right
+   rail is showing is already the first thing that rail says. */
+:is(#thermoInstrumentPicker, #mechInstrumentPicker, #mechSystemPicker) .shape-option.on{
+  background:transparent; box-shadow:none; color:var(--on-stage);
+}
+:is(#thermoInstrumentPicker, #mechInstrumentPicker, #mechSystemPicker) .shape-option.on:hover{ background:var(--stage-2); }
+:is(#thermoInstrumentPicker, #mechInstrumentPicker, #mechSystemPicker) .shape-option.on:active{ background:var(--stage-line); }
+:is(#thermoInstrumentPicker, #mechInstrumentPicker, #mechSystemPicker) .shape-option.on .lucide{ color:var(--accent); }
+
+/* The selected instrument's settings. A control that belongs to another
+   instrument is hidden rather than disabled: this panel is one instrument at a
+   time, and a greyed-out flame temperature under a bench would be a control for
+   something that is not on the stage. */
+.instrument-settings > *:last-child{ margin-bottom:0; }
+
+/* A readout that may carry one comparison underneath it - the bath behind a
+   temperature, say. Most carry none, and an empty line must not reserve space. */
+.readout.stacked{ display:block; }
+.readout.stacked + .readout.stacked{ margin-top:0; }
+.readout-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; }
+.readout-sub{ margin-top:4px; font-size:10.5px; line-height:1.45; color:var(--side-text-muted); }
+.readout-sub:empty{ display:none; }
+
+/* Two words under the speed histogram, because a chart with two marks on it
+   needs to say which is which and nothing more. */
+.plot-legend{
+  display:flex; align-items:center; gap:6px;
+  margin:0 0 18px; font-size:10.5px; color:var(--side-text-muted);
+}
+.plot-legend .key{ display:inline-block; width:10px; height:8px; border-radius:2px; }
+.plot-legend .key-bar{ background:rgba(177,140,245,0.55); }
+.plot-legend .key-curve{ width:12px; height:0; margin-left:7px; border-radius:0; border-top:1.6px solid rgba(255,255,255,0.5); }
+.plot-legend .key-line{ background:rgba(177,140,245,0.85); }
+.plot-legend .key-measured{ border-radius:50%; width:8px; height:8px; background:#7fc0b1; }
+/* A ledger that has lost energy says so on the row that measures it: the one
+   number on this page that must be zero. */
+.readout.bad .rv{ color:var(--danger-on-dark); }
+.readout.ledger-residual .rv{ font-weight:700; }
+/* The scale the picture is drawn at, when it is not the one the slider asks for:
+   the rig's stroke is longer than its bench, so the drawing has dropped to the
+   largest scale that fits. It is stated in the amber the force arrows use - the
+   one thing drawn on this stage that is worth looking at twice. */
+.readout .rv.is-capped{ color:#D98324; }
+
+/* ------------------------------------ charts ------------------------------------ */
+.plot{
+  position:relative; width:100%; margin:2px 0 12px; overflow:hidden;
+  border:1px solid var(--side-border); border-radius:var(--radius-sm);
+  background:rgba(232,231,240,0.025);
+}
+.plot canvas{ display:block; width:100%; }
+/* The height of a chart is declared here and nowhere else, so the box it lives
+   in is a known size before anything is drawn into it - a chart that sized
+   itself from a measurement could measure nothing and vanish. One height for
+   both of them, because they are two readings of the same gas and a rail that
+   gave one of them half again the room would be saying it matters more. */
+#thermo .plot-histogram{ margin:2px 0 14px; }
+#thermo .plot-histogram canvas{ height:150px; }
+#thermo .plot-trace{ margin:2px 0 4px; }
+#thermo .plot-trace canvas{ height:150px; }
+
+/* The energy ledger as three bars on one scale, so "which term did it" is a
+   glance rather than a subtraction. */
+.ledger{ display:flex; gap:6px; margin-top:12px; }
+.ledger-bar{ flex:1 1 0; height:6px; border-radius:3px; background:var(--side-bg-3); overflow:hidden; }
+.ledger-fill{ display:block; height:100%; width:0; border-radius:3px; background:var(--accent); transition:width .12s linear; }
+.ledger-fill.ledger-w{ background:#e0b48a; }
+.ledger-fill.ledger-esc{ background:#7fc0b1; }
+.ledger-fill.negative{ background:var(--danger-on-dark); }
+
+/* ============================ MECHANICAL PANELS ============================ */
+/* The Vibrations rail is the same furniture a third time, and this block is
+   deliberately short: three benches in one app are three views of one
+   instrument, and a rail whose rows moved when the topic changed would be
+   telling the reader it had been rebuilt when it had not.
+
+   Two things are new to the rail. One is a panel built from the model instead of
+   from a fixed list - a row per mass, per spring and per dashpot, as many as the
+   system has - and rows in a run need a hairline between them or a five-mass rig
+   reads as a heap. The other is a transfer function printed as a fraction. */
+
+/* The model's rows: one slider per mass, spring and dashpot, all in the same
+   rhythm as every other row on every other rail. Each one is also a way of
+   picking the element it names - a press on it opens that spring's own panel -
+   and the cursor is what says so; a hairline between them would be a second kind
+   of separator on a rail that has nothing else of the sort in it. */
+.model-rows{ margin-top:2px; }
+
+/* A model row that is the one the stage has selected says so, the way a selected
+   thing says so everywhere else: in ink. */
+.model-rows .ctrl.picked .ctrl-label{ color:var(--side-text); }
+
+/* The transfer function, as a fraction. The numerator and the denominator are a
+   block each and the bar between them is the denominator's own border, so it is
+   exactly as wide as the wider of the two whatever they come to - which for a
+   quarter car is a quartic over a quartic and for one mass is 1 over m s² + c s + k.
+   The whole thing scrolls sideways rather than wrapping mid-term if a rail is
+   ever narrow enough that it must. */
+.formula{
+  margin:14px 0 6px; padding:12px 13px;
+  border:1px solid var(--side-border); border-radius:var(--radius-sm);
+  background:rgba(232,231,240,0.025);
+  overflow-x:auto; white-space:nowrap;
+  font-size:11.5px; line-height:1.55; color:var(--side-text);
+}
+.formula-frac{ display:inline-block; vertical-align:middle; text-align:center; }
+.formula-num{ display:block; padding:0 7px; }
+.formula-den{ display:block; padding:0 7px; border-top:1.4px solid currentColor; }
+
+/* The stage. A part under the pointer is a part that goes where the hand puts it
+   - a block, a part lying on the bench, a shaker, the probe - so the cursor over
+   one is the hand's own, the same one the empty stage wears. The one press that
+   is not a move is the right-press that resizes, and that is the only one that
+   wears the two-headed arrow; the grips on a picked part wear their own, one per
+   corner, from frontend/ui.js. */
+#mechCanvas{ width:100%; height:100%; display:block; cursor:grab; }
+#mechCanvas:active{ cursor:grabbing; }
+#mechCanvas.mass-hover, #mechCanvas.thing-hover{ cursor:grab; }
+#mechCanvas.mass-dragging, #mechCanvas.part-dragging,
+#mechCanvas.mass-dragging:active, #mechCanvas.part-dragging:active{ cursor:grabbing; }
+#mechCanvas.mass-resizing, #mechCanvas.mass-resizing:active{ cursor:ew-resize; }
+
+/* The three charts. The heights are declared here and nowhere else, so each box
+   is a known size before anything is drawn into it; the response gets the most
+   room because it is the one that is read rather than glanced at. */
+#mech .plot-roots canvas{ height:132px; }
+#mech .plot-bode canvas{ height:142px; }
+#mech .plot-response{ margin:2px 0 4px; }
+#mech .plot-response canvas{ height:150px; }
+
+/* The left corner of this stage is a column of two strips - the systems and the
+   instruments - because this bench has two answers to "what should be on the
+   stage": the rig itself, and the apparatus standing beside it. */
+.stage-corner.left{ align-items:flex-start; }
+
+/*
+   The stage's notices, in one column.
+
+   Both notices used to position themselves in the same corner independently,
+   which is the same corner twice: a session restored with a loose part on the
+   bench is not an impossible state, and it is two panels landing on each other
+   when it happens. The column owns the corner, the notices are its children,
+   and the two stack in it - the bench's note above the session's, because the
+   bench's note is the one with a fix in it.
+*/
+.stage-notices{
+  position:absolute; right:22px; bottom:22px; z-index:12;
+  display:flex; flex-direction:column; align-items:flex-end; gap:6px;
+  max-width:min(420px, calc(100% - 44px));
+  pointer-events:none;
+}
+/* Named rather than `> *`: both children are given their own `position:absolute`
+   corner later in this file, and a universal selector is the same weight as a
+   class, so the later rule would win. */
+.stage-notices > .session-note,
+.stage-notices > .bench-notes{ position:static; inset:auto; pointer-events:auto; }
+.stage-notices > .session-note{ max-width:min(360px, 100%); }
+.stage-notices > .bench-notes{ max-width:min(420px, 100%); }
+
+/*
+   The bench's own notes: what it is holding that is not holding anything.
+
+   The same corner the session notice uses, and deliberately the same shape: on
+   this stage there is only ever one thing the bench needs to say, and two
+   notices in one corner would be two notices competing. The line is a *thing on
+   the stage*, not a panel - it is the label of a part that has come off, written
+   where the part is - so it is a pill with a warning glyph and a row of the
+   parts that are loose, each one a press away from its own panel.
+*/
+.bench-notes{
+  position:absolute; right:22px; bottom:22px; z-index:12;
+  display:flex; flex-direction:column; gap:4px;
+  max-width:min(420px, calc(100% - 44px));
+  padding:9px 12px 10px;
+  border:1px solid var(--border); border-radius:var(--radius-md);
+  background:#f4f3f8f2; color:var(--on-stage-2);
+  box-shadow:var(--shadow-1);
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  font-family:var(--font); font-size:11.5px; line-height:1.35;
+}
+.bench-notes-head{
+  display:flex; align-items:center; gap:6px;
+  font-weight:600; color:var(--on-stage);
+}
+.bench-notes-head svg{ flex:0 0 auto; color:var(--danger); }
+.bench-note{
+  display:flex; align-items:baseline; gap:6px;
+  padding:5px 7px; margin:0 -4px; border:0; border-radius:6px;
+  background:transparent; color:inherit; text-align:left;
+  font:inherit; cursor:pointer;
+  transition:background .14s ease, color .14s ease;
+}
+.bench-note:hover{ background:var(--stage-2); color:var(--on-stage); }
+.bench-note .who{ font-weight:600; color:var(--danger); }
+.bench-note .what{ color:var(--on-stage-2); }
+/* A part that is holding nothing says so in the panel too, in the same words:
+   a reader who has just dragged a spring off a block is looking at the panel,
+   not at the corner of the stage. */
+.instrument-note.is-loose{ color:var(--danger); }
+
+@media (max-width: 900px){
+  /* Under 900 the lab brief runs the full width of the stage, so the corners the
+     notices stand in on a wide screen are gone and the only room left for them
+     is the band under the launchers. It starts at 136px because the launcher
+     column on the right is a lab pill over the zoom well while the well is still
+     shown - 106px of well and pill plus the 12px inset and a little air - and at
+     96px once the well is gone at 640.
+
+     Side by side here rather than stacked: a tablet has the width for a row and
+     none of the height for a column, and a row is what keeps the pair clear of
+     the brief. */
+  .stage-notices{
+    top:136px; left:12px; right:12px; bottom:auto; max-width:none;
+    flex-direction:row; flex-wrap:wrap; justify-content:flex-end; align-items:flex-start;
+  }
+  .stage-notices > .session-note{ max-width:min(360px, 100%); }
+  .stage-notices > .bench-notes{ max-width:min(300px, 100%); }
+  .session-note{ top:136px; left:12px; right:12px; bottom:auto; max-width:none; }
+  /* The brief gets a ceiling for the same reason its phone rule does: what the
+     band above it needs is a top edge it can rely on, and the brief's own height
+     is a function of how long an experiment's write-up is. */
+  .lab-card{ left:12px; right:12px; bottom:12px; width:auto; max-height:min(54%, 260px); overflow-y:auto; overscroll-behavior:contain; }
+  .rule-height{ width:38px; }
+  .rule-height .tick-label{ right:10px; font-size:9px; }
+  .rule-distance{ height:26px; }
+  .rule-distance .tick-label{ top:8px; font-size:9px; }
+}
+@media (max-width: 640px){
+  /* The brief is taller than the stage's leftover room on a phone - the lab's own
+     "what to look for" list alone is most of it - so it gets a ceiling and
+     scrolls inside itself. What that buys is a band under the launchers that the
+     stage's notices can actually stand in, instead of sliding off the top of the
+     brief. */
+  .lab-card{
+    left:12px; right:12px; bottom:12px; width:auto; padding:12px 13px 13px;
+    max-height:190px; overflow-y:auto; overscroll-behavior:contain;
+  }
+  .lab-picker{ position:fixed; top:auto; left:12px; right:12px; bottom:64px; width:auto; max-height:52vh; }
+  .stage-rules{ display:none; }
+  /* Full-width at the bottom would land on the lab brief, so it moves up under
+     the launchers instead - where the brief is not. */
+  /* The stages that carry one notice rather than the column: the same band under
+     the launchers, for the same reason. */
+  .session-note{ top:96px; right:12px; bottom:auto; left:12px; max-width:none; }
+  /* The corner under the launchers is the one piece of the stage a phone has no
+     room for: the notice stands in it, and the stage answers a pinch, which is
+     the gesture a phone actually has. */
+  .stage-zoom{ display:none; }
+  /* The stage's notices go up under the launchers.
+
+     They used to be pinned 54px down, which is the height of one row of launcher
+     pills - and on a phone the launcher corner is a column of two strips, so the
+     second row ends at 88. Every notice was therefore half-covering a pill. 96px
+     is below the second row and above the lab brief, and the column stacks the
+     two notices in it rather than letting them find the same corner. */
+  .stage-notices{
+    top:96px; left:12px; right:12px; bottom:auto; max-width:none;
+    flex-direction:column; flex-wrap:nowrap; justify-content:flex-start;
+    align-items:flex-start;
+  }
+  .stage-notices > .session-note,
+  .stage-notices > .bench-notes{ max-width:none; }
+
+  /* The bottom of the stage and the two tabs are neighbours now, and a tall lab
+     brief used to reach up into the tabs' band: on a 390x844 phone the tab ended
+     at 484 and the brief began at 466, so the two corners crossed by 15px of
+     width. Capping the brief's height would only have moved the same collision
+     to the next phone, so the stack steps in past the tabs' inner edge instead -
+     16px more on top of the 12px gutter, which is the 28 the tab stops at. */
+  .viewport > .lab-card,
+  .viewport > .stage-notices,
+  .viewport > .session-note{ margin-left:16px; margin-right:16px; }
+}

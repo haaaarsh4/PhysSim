@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Physics Workbench">
+  <!--
+    One body on a tilted orbit, in the workbench's own three colours: the shell
+    ink for the tile, the chrome white for the path, the violet accent for the
+    body itself. It reads the same way at 16px in a tab and at 64px pinned,
+    which matters more here than any detail below 32px.
+  -->
+  <rect width="64" height="64" rx="15" fill="#23232B"/>
+  <rect x="1" y="1" width="62" height="62" rx="14" fill="none" stroke="#E8E7EF" stroke-opacity="0.10" stroke-width="1.5"/>
+  <!-- the path: rx 21 by ry 11, tipped 28 degrees, so it never resolves into a
+       flat ring and never into a bar -->
+  <ellipse cx="32" cy="32" rx="21" ry="11" fill="none" stroke="#E8E7EF" stroke-opacity="0.88" stroke-width="3.4" transform="rotate(-28 32 32)"/>
+  <!-- the body at rest: the accent, the one saturated pixel on the tile -->
+  <circle cx="32" cy="32" r="7" fill="#9E00FF"/>
+  <!-- a second body further along the same path, so the mark says collision and
+       not just circle. Its point is the ellipse's own left vertex, rotated. -->
+  <circle cx="13.5" cy="41.9" r="4" fill="#E8E7EF"/>
+</svg>
