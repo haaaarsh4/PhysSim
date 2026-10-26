@@ -237,8 +237,9 @@ let heroResize = null;
 const home = document.getElementById('home');
 const app = document.getElementById('app');
 const thermoApp = document.getElementById('thermo');
-const mechApp = document.getElementById('mech');
 const modal = document.getElementById('topicModal');
+const mechApp = document.getElementById('mech');
+const fluidsApp = document.getElementById('fluids');
 
 /* Each topic is a real subpage with its own segment, its own shell and its own
    module. Adding one is adding a row to this table and a shell to index.html -
@@ -253,6 +254,8 @@ const TOPICS = {
   /* Same reason again: the module is mech_main.js so that /mech is served as
      the page and not as the module. */
   mech:     { seg: 'mech',     title: 'Vibrations Workbench', shell: () => mechApp, boot: () => import('./mech_main.js').then((m) => m.bootMechWorkbench()) },
+  /* And again: fluids_main.js, so /fluids is the page and not the module. */
+  fluids:   { seg: 'fluids',   title: 'Fluids Workbench',   shell: () => fluidsApp, boot: () => import('./fluids_main.js').then((m) => m.bootFluidsWorkbench()) },
 };
 
 /* Derived from wherever this page was actually served from, so the routes keep
@@ -295,6 +298,8 @@ function render(route) {
   root.classList.toggle('route-workbench', !!topic);
   if (home) home.hidden = !!topic;
   document.title = topic ? topic.title : 'Physics Workbench';
+  /* Leaving the page closes the picker, so coming back to the homepage never
+     lands on a sheet that was left open over a bench. */
   closePicker();
 
   /* Exactly one shell is allowed to own the screen. A topic left behind keeps
@@ -302,6 +307,7 @@ function render(route) {
   if (app) app.hidden = route !== 'dynamics';
   if (thermoApp) thermoApp.hidden = route !== 'thermo';
   if (mechApp) mechApp.hidden = route !== 'mech';
+  if (fluidsApp) fluidsApp.hidden = route !== 'fluids';
 
   if (!topic) {
     /* The hero canvas was never able to measure itself if the page opened on a
@@ -340,21 +346,29 @@ window.addEventListener('popstate', () => {
   render(routeOf());
 });
 
+/* The picker: the one button on the hero opens it, and the list inside is the
+   only place an experiment is chosen from. */
 function openPicker() {
-  mountModalIcons();
   modal && modal.classList.add('open');
 }
 function closePicker() {
   modal && modal.classList.remove('open');
 }
 
-/* The picker's icons (and lucide itself) only matter once it is opened. */
+document.getElementById('tryItBtn')?.addEventListener('click', openPicker);
+document.getElementById('closeModalBtn')?.addEventListener('click', closePicker);
+modal?.addEventListener('click', (e) => { if (e.target === modal) closePicker(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePicker(); });
+
+/* The picker's icons, and the play mark on the button beside it: lucide is
+   fetched once, after the page has painted, so the first frame is type and
+   panels and nothing else. */
 let iconsMounted = false;
-function mountModalIcons() {
+function mountIcons() {
   if (iconsMounted) return;
   iconsMounted = true;
-  import('lucide').then(({ createElement, X, ArrowRight }) => {
-    const MAP = { X, ArrowRight };
+  import('lucide').then(({ createElement, ArrowRight, Play, X }) => {
+    const MAP = { ArrowRight, Play, X };
     for (const el of document.querySelectorAll('[data-icon]')) {
       const node = MAP[el.dataset.icon];
       if (!node) continue;
@@ -365,11 +379,9 @@ function mountModalIcons() {
   });
 }
 
-document.getElementById('tryItBtn')?.addEventListener('click', openPicker);
-document.getElementById('closeModalBtn')?.addEventListener('click', closePicker);
-modal?.addEventListener('click', (e) => { if (e.target === modal) closePicker(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePicker(); });
-
+/* One row per bench, each one a link into its own workbench. The rows are real
+   buttons, so Tab reaches them and Enter opens the bench - the same contract
+   the benches' own lists keep. */
 document.querySelectorAll('.topic-row').forEach((card) => {
   card.addEventListener('click', () => {
     if (card.disabled) return;
@@ -389,8 +401,9 @@ function backHome() {
   if (enteredInApp) history.back();
   else navigate('home', { replace: true });
 }
-for (const id of ['backHomeBtn', 'thermoBackHomeBtn', 'mechBackHomeBtn']) {
+for (const id of ['backHomeBtn', 'thermoBackHomeBtn', 'mechBackHomeBtn', 'fluidsBackHomeBtn']) {
   document.getElementById(id)?.addEventListener('click', backHome);
 }
 
+mountIcons();
 render(routeOf());

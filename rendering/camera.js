@@ -36,6 +36,12 @@ export class OrbitCameraController {
        of, which is what this controller had before it had them. */
     this.minElevation = opts.minElevation ?? -1.3;
     this.maxElevation = opts.maxElevation ?? 1.4;
+    /* How far the camera may swing round the side. A scene that is a slab - one
+       plane of a tank, drawn with thickness - has a view from the side that is
+       the edge of the slab and nothing else, so the swing is the caller's
+       business too, and unbounded by default. */
+    this.minAzimuth = opts.minAzimuth ?? -Math.PI;
+    this.maxAzimuth = opts.maxAzimuth ?? Math.PI;
 
     this._dragging = false;
     this._lastX = 0; this._lastY = 0;
@@ -52,7 +58,7 @@ export class OrbitCameraController {
       if (!this._dragging) return;
       const dx = e.clientX - this._lastX, dy = e.clientY - this._lastY;
       this._lastX = e.clientX; this._lastY = e.clientY;
-      this.azimuth -= dx * 0.006;
+      this.azimuth = Math.max(this.minAzimuth, Math.min(this.maxAzimuth, this.azimuth - dx * 0.006));
       this.elevation = Math.max(this.minElevation, Math.min(this.maxElevation, this.elevation + dy * 0.006));
       this.update();
       if (this.onInteract) this.onInteract();

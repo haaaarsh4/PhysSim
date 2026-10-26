@@ -1,12 +1,12 @@
 /**
- * frontend/drawer.js - the two rails, as drawers, on a phone.
+ * frontend/drawer.js - the two rails, as drawers, on a tablet or a phone.
  *
  * A workbench is three things side by side: what you set up, what you watch, and
  * what it says. Three columns is the right shape for that on a desk and the wrong
- * shape on a phone, where the only thing worth the whole screen is the stage -
+ * shape below it, where the only thing worth the whole screen is the stage -
  * the scene, or the box of gas, or the rig.
  *
- * So below the phone breakpoint the two rails step out of the column and become
+ * So below the drawer breakpoint the two rails step out of the column and become
  * drawers over the stage, and the stage has the screen to itself. What is left of
  * them on the stage is a tab at each edge: the handle of a drawer, which is what
  * a tab on the edge of a picture has always meant. A tab opens its own drawer,
@@ -15,12 +15,12 @@
  * moves while it happens.
  *
  * Nothing here decides *when* the drawers exist: that is the breakpoint in
- * style.css, and this module's only job is the three things CSS cannot do - the
- * scrim, the tabs, and the state they share. It is deliberately inert on a wide
- * screen, where the rails are columns again and the tabs are gone.
+ * workbench.css, and this module's only job is the three things CSS cannot do -
+ * the scrim, the tabs, and the state they share. It is deliberately inert on a
+ * wide screen, where the rails are columns again and the tabs are gone.
  */
 
-const DRAWER_QUERY = "(max-width: 640px)";
+const DRAWER_QUERY = "(max-width: 1100px)";
 
 /* The tab: a drawer handle on the edge of the stage, with the name of what is
    behind it written down its length the way the spine of a book is. */

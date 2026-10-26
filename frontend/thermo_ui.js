@@ -114,6 +114,7 @@ function toggle(label, initial, onChange) {
   const sw = el("button", `tswitch${initial ? " on" : ""}`, "<i></i>");
   sw.type = "button";
   sw.setAttribute("role", "switch");
+  sw.setAttribute("aria-label", label);
   sw.setAttribute("aria-checked", String(!!initial));
   sw.addEventListener("click", () => {
     const next = !sw.classList.contains("on");
@@ -312,6 +313,14 @@ export function buildThermoLeftRail(container, callbacks = {}) {
      *  - and this control is the only place that fact is written down. */
     syncLidMode(mode) { lidMode.pick(mode ?? "fixed"); },
     syncSteps(v) { stepsS.setValue(v); },
+    /** The three controls of the timeline, together: a reset puts the clock back
+     *  to the rate the bench opens at, and a rail that kept its own rate would be
+     *  the one part of the page that did not. */
+    syncTimeline({ steps, ramp, resolution }) {
+      if (steps !== undefined) stepsS.setValue(steps);
+      if (ramp !== undefined) rampS.setValue(ramp);
+      if (resolution !== undefined) precision.pick(String(resolution));
+    },
   };
 }
 

@@ -486,7 +486,7 @@ export function createStageRules(container) {
  * It sits on the stage rather than in a rail because the questions are about
  * what is on the stage. A rail scrolls; the thing being asked about does not.
  */
-export function createLabCard(container) {
+export function createLabCard(container, { startCollapsed = false } = {}) {
   const card = el("div", "lab-card is-hidden");
   const head = el("div", "lab-card-head");
   // The card's label *is* the lab's name, in the accent the word "Lab" used to
@@ -506,9 +506,28 @@ export function createLabCard(container) {
      says so; the other workbench's labs do not carry one and the line simply
      is not drawn. */
   const hold = el("p", "lab-card-hold is-hidden", "");
-  head.append(name, close);
+  /* The brief is a fold, not a poster. On a stage whose subject is the middle of
+     the frame, a card that is always open covers the subject; the name is enough
+     to say which lab is running, and one click opens the rest. */
+  const toggle = el("button", "lab-card-toggle");
+  toggle.type = "button";
+  toggle.setAttribute("aria-label", "Show the lab brief");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M6 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  head.append(toggle, name, close);
   card.append(head, aim, setup, asks, hold);
   container.appendChild(card);
+
+  let collapsed = false;
+  const setCollapsed = (on) => {
+    collapsed = on;
+    card.classList.toggle("is-collapsed", on);
+    toggle.setAttribute("aria-expanded", String(!on));
+    toggle.setAttribute("aria-label", on ? "Show the lab brief" : "Hide the lab brief");
+  };
+  setCollapsed(startCollapsed);
+  toggle.addEventListener("click", (e) => { e.stopPropagation(); setCollapsed(!collapsed); });
+  name.addEventListener("click", () => setCollapsed(!collapsed));
 
   const hide = () => card.classList.add("is-hidden");
   close.addEventListener("click", hide);

@@ -219,7 +219,17 @@ export class PredictionLayer {
   update(launch) {
     this.line.visible = launch.show;
     if (!launch.show) return;
-    const { x, y, z, vx, vy, vz, gravity, floorY, radius } = launch;
+    /* A launch point with one missing component used to poison every third
+       vertex of this buffer with NaN: the dashed arc simply never drew, and
+       three.js warned once a frame that the geometry's bounds were NaN. The
+       caller is fixed, but a drawing helper still has no business writing NaN
+       into a buffer - one bad number would take the whole arc down again - so
+       every input is made finite here, once. */
+    const finite = (value, fallback = 0) => (Number.isFinite(value) ? value : fallback);
+    const x = finite(launch.x), y = finite(launch.y), z = finite(launch.z);
+    const vx = finite(launch.vx), vy = finite(launch.vy), vz = finite(launch.vz);
+    const gravity = finite(launch.gravity), floorY = finite(launch.floorY);
+    const radius = finite(launch.radius, 0.05);
     /* Where it comes back down: the positive root of y0 + vy t - gt^2/2 = floor.
        With no gravity there is no "down" to come back to, so the arc is drawn
        for a fixed second and simply leaves. */

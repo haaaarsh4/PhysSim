@@ -1,0 +1,99 @@
+  /**
+   * The curvature of the free surface, as a pressure boundary condition.
+   *
+   * Young-Laplace says the pressure just inside a curved surface is sigma *
+   * kappa above the air. Here that is not a force added to the velocities - it
+   * is the Dirichlet value the projection imposes at the interface, which is
+   * the same statement and a far better place to make it: a surface force
+   * applied as a volumetric body force on a level set that is two cells thick
+   * is a force with the wrong magnitude in the wrong place, and it rings at the
+   * grid scale.
+   *
+   * The curvature itself comes from a height function wherever the surface is
+   * one - the waterline read per column, differentiated twice - because that is
+   * second-order accurate at a cell size, and the level set's own curvature is
+   * not: a field smeared over two cells has a curvature of order 1/dx no matter
+   * how flat it really is. Where the liquid is not a height function (the
+   * underside of a drop, a folding sheet) the level-set curvature is used, which
+   * for a round drop is the right answer to within the thickness of the band.
+   */
+  surfaceCurvature() {
+    const { nx, ny, dx, phi, params } = this;
+    const kappa = this.curvature;
+    kappa.fill(0);
+    if (!(params.surfaceTension > 0)) return kappa;
+
+    /* The level-set curvature, in the band only: div(n) of a lightly smoothed
+       field, with n the outward normal. */
+    const smooth = this._smoothPhi ?? (this._smoothPhi = new Float64Array(phi.length));
+    for (let j = 0; j < ny; j++) {
+      for (let i = 0; i < nx; i++) {
+        const im = i > 0 ? i - 1 : i, ip = i < nx - 1 ? i + 1 : i;
+        const jm = j > 0 ? j - 1 : j, jp = j < ny - 1 ? j + 1 : j;
+        let s = 0;
+        s += phi[jm * nx + im] + 2 * phi[jm * nx + i] + phi[jm * nx + ip];
+        s += 2 * phi[j * nx + im] + 4 * phi[j * nx + i] + 2 * phi[j * nx + ip];
+        s += phi[jp * nx + im] + 2 * phi[jp * nx + i] + phi[jp * nx + ip];
+        smooth[j * nx + i] = s / 16;
+      }
+    }
+    const band = 3 * dx;
+    for (let j = 0; j < ny; j++) {
+      for (let i = 0; i < nx; i++) {
+        const k = j * nx + i;
+        if (Math.abs(phi[k]) > band) continue;
+        const im = i > 0 ? i - 1 : i, ip = i < nx - 1 ? i + 1 : i;
+        const jm = j > 0 ? j - 1 : j, jp = j < ny - 1 ? j + 1 : j;
+        const dnx = (nxvAt(smooth, nx, ny, ip, j, dx) - nxvAt(smooth, nx, ny, im, j, dx)) / ((ip - im) * dx);
+        const dny = (nyvAt(smooth, nx, ny, i, jp, dx) - nyvAt(smooth, nx, ny, i, jm, dx)) / ((jp - jm) * dx);
+        kappa[k] = dnx + dny;
+      }
+    }
+
+    /* The waterline of every column, and the height-function curvature of it:
+       kappa = -h'' / (1 + h'^2)^1.5, which for a crest is positive - the
+       pressure inside is higher, exactly as on a drop. */
+    const colTop = this._colTop ?? (this._colTop = new Int32Array(nx));
+    const h = this._colH ?? (this._colH = new Float64Array(nx));
+    for (let i = 0; i < nx; i++) {
+      colTop[i] = -1;
+      for (let j = ny - 1; j >= 0; j--) {
+        const a = phi[j * nx + i];
+        const b = j + 1 < ny ? phi[(j + 1) * nx + i] : a;
+        if (a < 0 && b >= 0) {
+          colTop[i] = j;
+          h[i] = (j + a / (a - b)) * dx;
+          break;
+        }
+      }
+    }
+    const dh = (i) => {
+      const l = i > 0 && colTop[i - 1] >= 0, r = i < nx - 1 && colTop[i + 1] >= 0;
+      if (l && r) return (h[i + 1] - h[i - 1]) / (2 * dx);
+      if (r) return (h[i + 1] - h[i]) / dx;
+      if (l) return (h[i] - h[i - 1]) / dx;
+      return 0;
+    };
+    const d2h = (i) => {
+      const l = i > 0 && colTop[i - 1] >= 0, r = i < nx - 1 && colTop[i + 1] >= 0;
+      if (l && r) return (h[i + 1] - 2 * h[i] + h[i - 1]) / (dx * dx);
+      return 0;
+    };
+    for (let i = 0; i < nx; i++) {
+      if (colTop[i] < 0) continue;
+      const slope = dh(i);
+      /* A surface steeper than about 60 degrees is not a height function where
+         it is read: the columns either side are a different part of the same
+         fold, and differencing across them is a curvature that is not there. */
+      if (Math.abs(slope) > 1.9) continue;
+      const curv = -d2h(i) / Math.pow(1 + slope * slope, 1.5);
+      /* Written onto the top wet cell and the air cell above it: both are cells
+         the interface passes between, and both are asked for this number when
+         the projection looks for the pressure at the surface. */
+      const j = colTop[i];
+      kappa[j * nx + i] = curv;
+      if (j + 1 < ny) kappa[(j + 1) * nx + i] = curv;
+    }
+    return kappa;
+  }
+

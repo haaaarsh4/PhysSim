@@ -176,6 +176,7 @@ function toggle(label, initial, onChange) {
   const sw = el("button", `tswitch${initial ? " on" : ""}`, "<i></i>");
   sw.type = "button";
   sw.setAttribute("role", "switch");
+  sw.setAttribute("aria-label", label);
   sw.setAttribute("aria-checked", String(!!initial));
   sw.addEventListener("click", () => {
     const next = !sw.classList.contains("on");
@@ -564,10 +565,17 @@ function drawRootMap(canvas, poles, zeros) {
   }
   maxIm = Math.max(maxIm, 1e-9);
   const pad = 8 * dpr;
-  const span = Math.max(maxRe / 0.8, 1e-9);
-  const x = (re) => pad + ((re + span) / (2 * span)) * (W - pad * 2);
-  const scale = (W - pad * 2) / (2 * span);
-  const y = (im) => H / 2 - im * scale;
+  /* The two axes are scaled independently, and they have to be. A lightly
+     damped pole sits a few hundredths to the left of the imaginary axis and a
+     whole natural frequency above it - 12 to 1 on the default rig - so a single
+     scale taken from the real part drew every pole far above the top of the
+     canvas. The map was an empty plate with axes on it, which is exactly what
+     it looked like. Each axis now fits its own extent, the origin stays in the
+     middle, and a pole is on the picture whatever the damping. */
+  const spanRe = Math.max(maxRe / 0.8, 1e-9);
+  const spanIm = Math.max(maxIm * 1.12, 1e-9);
+  const x = (re) => pad + ((re + spanRe) / (2 * spanRe)) * (W - pad * 2);
+  const y = (im) => H / 2 - (im / spanIm) * ((H - pad * 2) / 2);
 
   ctx.strokeStyle = GRID;
   ctx.lineWidth = 1;

@@ -49,6 +49,7 @@ import { MECH_LABS } from "./mech_labs.js";
 import { MECH_SYSTEMS } from "./mech_systems.js";
 import { MECH_INSTRUMENTS } from "./mech_instruments.js";
 import { createLabCard } from "./ui.js";
+import { mountAxisGizmo } from "./axis_gizmo.js";
 import {
   downloadCSV, downloadJSON, uploadJSONFile, loadFromLocalStorage, saveToLocalStorage,
 } from "../storage/io.js";
@@ -124,6 +125,10 @@ export function bootMechWorkbench() {
      picture from the physics. */
   const system = new MechSystem(DEFAULT_STATE);
   const renderer = new MechRenderer(canvas, system);
+  /* The same orientation triad as the other two benches, reading this rig's
+     camera. Mounted before the first frame is drawn, so the corner is never
+     empty on arrival. */
+  const axisGizmo = mountAxisGizmo(document.getElementById("mechViewport"), () => renderer.camera);
 
   let running = false;
   let stepsPerFrame = 12;
@@ -999,6 +1004,18 @@ export function bootMechWorkbench() {
     rightRail.setInstrument(null);
     system.setSpec(DEFAULT_STATE);
     systemId = MECH_SYSTEMS[0].id;
+    /* The timeline is part of the bench and not part of the rig, so `setSpec`
+       cannot put it back: the step the solve is cut on, how many of those a
+       frame runs, and how far the picture magnifies the motion. Cleared here so
+       a reset clears the rail as well as the stage - a rig at one mass under a
+       panel still magnifying a hundredfold is two answers to one question. */
+    system.setDt(1 / 600);
+    stepsPerFrame = 12;
+    motionScale = 1;
+    renderer.setMotionScale(motionScale);
+    leftRail.syncStepSize(system.dt);
+    leftRail.syncSteps(stepsPerFrame);
+    leftRail.syncMotion(motionScale);
     renderer.clearStage();
     renderer.clearPlaces();
     clearTrace();
@@ -1162,7 +1179,12 @@ export function bootMechWorkbench() {
     renderer.setViewMode(mode);
     renderer.resize();
     renderer.frame();
+    /* A rig seen flat has no orientation to report: the triad belongs to the
+       orbit, and the 2D view has no orbit. */
+    if (axisGizmo?.element) axisGizmo.element.style.display = mode === "2d" ? "none" : "";
     for (const b of viewToggle.querySelectorAll("button")) b.classList.toggle("on", b.dataset.mode === mode);
+    const hint = document.getElementById("mechStageHint");
+    if (hint) hint.textContent = mode === "2d" ? "Drag to pan · scroll to zoom" : "Drag to orbit · scroll to zoom";
   }
 
   /* A rig is a set of parts bolted to each other and to the ground, and this

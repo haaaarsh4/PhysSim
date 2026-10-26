@@ -52,6 +52,7 @@ import {
 } from "./ui.js";
 import { LABS } from "./labs.js";
 import { mountStageDrawers } from "./drawer.js";
+import { mountAxisGizmo } from "./axis_gizmo.js";
 import {
   PredictionLayer, StageGrid, TrailLayer, VectorLayer,
 } from "../rendering/instruments.js";
@@ -154,9 +155,10 @@ const stageGrid = new StageGrid(renderer.scene, {
 const labCard = createLabCard(document.getElementById("viewport"));
 const stageRules = createStageRules(document.getElementById("viewport"));
 
-const tools = {
+const DEFAULT_TOOLS = {
   trails: true, vectors: false, predict: true, grid: true, slowmo: false, record: false,
 };
+const tools = { ...DEFAULT_TOOLS };
 
 /** The launch the last spawn actually used, so the predicted path can be drawn
  *  from the same place and at the same speed as the ball it is predicting. */
@@ -897,7 +899,7 @@ function spawnBalls(spawn, mode) {
   }
   ejectFromShapes(from);
   if (ps.count > from) {
-    lastLaunch = { x: ps.posX[from], y: ps.posY[from], z: ps.posZ[from], vx, vy, radius: ps.radius[from] };
+    lastLaunch = { x: ps.posX[from], y: ps.posY[from], z: ps.posZ[from], vx, vy, vz: 0, radius: ps.radius[from] };
   }
   trails.clear();
   rebaseEnergy();
@@ -1302,15 +1304,23 @@ function makeCameraController(mode) {
 
 let cameraController = makeCameraController(viewMode);
 
+/* The orientation triad in the corner of the stage. It reads whichever camera
+   is active, so it follows the 3D/2D switch by itself. */
+const axisGizmo = mountAxisGizmo(document.getElementById("viewport"), () => renderer.camera);
+
 function setViewMode(mode) {
   if (mode === viewMode) { layoutStageRules(); return; }
   viewMode = mode;
   renderer.setViewMode(mode);
+  /* A flat view cannot be turned, so a triad on it would be reporting an
+     orientation nobody can change. */
+  if (axisGizmo?.element) axisGizmo.element.style.display = mode === "2d" ? "none" : "";
   cameraController.dispose();
   cameraController = makeCameraController(mode);
   // A lab sets the view, so the toggle has to follow the view rather than the
   // other way round - the two ways in must not disagree about which is on.
   for (const b of viewToggle.querySelectorAll("button")) b.classList.toggle("on", b.dataset.mode === mode);
+  if (stageHint) stageHint.textContent = mode === "2d" ? "Drag to pan · scroll to zoom" : "Drag to orbit · scroll to zoom";
   canvas.setAttribute("aria-label", VP_LABELS[mode]);
   resize();
   /* Which view someone works in is a choice about their bench, not about this
@@ -1330,6 +1340,7 @@ function resetView() {
 }
 
 const viewToggle = document.getElementById("viewToggle");
+const stageHint = document.getElementById("stageHint");
 viewToggle.querySelectorAll("button").forEach((b) => {
   b.addEventListener("click", () => {
     viewToggle.querySelectorAll("button").forEach((x) => x.classList.remove("on"));
@@ -1480,13 +1491,53 @@ document.getElementById("stepBtn").addEventListener("click", () => stepOnce());
 const restartBtn = document.getElementById("restartBtn");
 restartBtn.addEventListener("click", () => restartRun());
 syncRestartButton();
-document.getElementById("resetBtn").addEventListener("click", () => {
+/*
+ * Reset clears the bench, not only the bodies standing on it.
+ *
+ * The scene goes - bodies and shapes both - and so does everything the left
+ * rail was last set to: the coefficients the solver was running on, the batch
+ * the spawn panel would deal next, and the instruments. A cleared bench still
+ * reading 24 m/s2 of gravity, 1.0 of restitution and a four-hundred-ball batch
+ * is a panel describing a scene that is no longer there, which is the one thing
+ * a reset must never leave behind. The run stops with it: a bench with nothing
+ * on it and a clock still counting is a run of nothing.
+ */
+function resetBench() {
+  setRunning(false);
   ps.clear();
   held.clear();
   ballSelection.clear();
+  trails.clear();
+  rebaseEnergy();
   clearShapes(); // "clear the scene" means the whole scene
+  setParams(DEFAULT_PARAMS);
+  leftRailApi.setParams(params);
+  Object.assign(tools, DEFAULT_TOOLS);
+  leftRailApi.setTools(tools);
+  leftRailApi.setSpawn({ ...DEFAULT_SPAWN });
+  /* The clock and the counters belong to the run that has just been thrown
+     away: a cleared bench is time zero, not the time the last experiment
+     happened to reach. The recording goes with it - a series of samples of a
+     scene that no longer exists is not the next run's data. */
+  frame = 0;
+  simTime = 0;
+  stepMsSmooth = 0;
+  collisionChecks = 0;
+  recording.length = 0;
+  recordAccum = 0;
+  leftRailApi.setRecorded(0);
+  document.getElementById("sbFrame").textContent = "0";
+  document.getElementById("sbTime").textContent = "0.00s";
+  document.getElementById("sbRuntime").textContent = "0.00ms";
+  inspector.setPerf({ stepMs: 0, collisionChecks: 0, fps: fpsSmooth });
+  /* No lab is the scene any more, so no lab is the one this bench is on. */
+  for (const row of labRows.values()) row.classList.remove("on");
+  inspector.resetMeasurements();
+  renderInspector();
   markRunStart(true); // an empty scene is where the next run begins
-});
+}
+
+document.getElementById("resetBtn").addEventListener("click", resetBench);
 
 document.getElementById("saveBtn").addEventListener("click", () => {
   downloadJSON(`physics-workbench-checkpoint-${Date.now()}.json`, serializeParticleSystem(ps));
@@ -2019,8 +2070,14 @@ function groupReport(sel) {
 /* --------------------------------------- resize --------------------------------------- */
 function resize() {
   const vp = document.getElementById("viewport");
-  renderer.resize(vp.clientWidth, vp.clientHeight);
-  if (viewMode === "2d") cameraController.resize(vp.clientWidth, vp.clientHeight);
+  /* The canvas, not the stage: the stage owns a toolbar row above the glass
+     now, and a renderer sized to the whole stage would draw every scene taller
+     than the box it is shown in. The fallback is for the one frame before the
+     shell has been laid out, when both numbers are zero. */
+  const width = canvas.clientWidth || vp.clientWidth;
+  const height = canvas.clientHeight || vp.clientHeight;
+  renderer.resize(width, height);
+  if (viewMode === "2d") cameraController.resize(width, height);
   layoutStageRules();
 }
 window.addEventListener("resize", resize);
@@ -2203,7 +2260,7 @@ function predictionInput() {
   return {
     show: tools.predict && launched,
     x: lastLaunch?.x ?? 0, y: lastLaunch?.y ?? 0, z: lastLaunch?.z ?? 0,
-    vx: lastLaunch?.vx ?? 0, vy: lastLaunch?.vy ?? 0,
+    vx: lastLaunch?.vx ?? 0, vy: lastLaunch?.vy ?? 0, vz: lastLaunch?.vz ?? 0,
     radius: lastLaunch?.radius ?? 0.05,
     gravity: params.gravity, floorY: FLOOR_Y,
   };

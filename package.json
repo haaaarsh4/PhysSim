@@ -10,9 +10,11 @@
     "preview": "vite preview",
     "sweep": "node experiments/parameter_sweep.js",
     "bench": "node experiments/benchmarks.js",
-    "check": "node experiments/dynamics_checks.js && node experiments/thermo_checks.js && node experiments/mech_checks.js",
+    "check": "node experiments/dynamics_checks.js && node experiments/thermo_checks.js && node experiments/mech_checks.js && node experiments/fluid3d_checks.js",
     "check:thermo": "node experiments/thermo_checks.js",
-    "check:mech": "node experiments/mech_checks.js"
+    "check:mech": "node experiments/mech_checks.js",
+    "check:fluids": "node experiments/fluid3d_checks.js",
+    "check:fluids-2d": "node experiments/fluids_checks.js"
   },
   "dependencies": {
     "three": "^0.160.0",

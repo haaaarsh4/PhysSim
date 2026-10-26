@@ -28,7 +28,7 @@ export const REF = {
   cy: 86,            // mouth plane, and the bend centre's own height
   rin: 192.5,        // inner wall
   rout: 380.5,       // outer wall
-  split: 416,        // the seam, 48.7% across
+  split: 414.6,      // the seam: the bend's own centre, 48.548% across
 };
 
 export const BOX = { w: REF.w, h: REF.h - REF.top };
@@ -37,8 +37,8 @@ export const BOX = { w: REF.w, h: REF.h - REF.top };
    slightly outside the wall's own midline, the way a ball sits in a trough */
 export const BALL = { r: 57, path: 312 };
 
-export const PANEL_LEFT = [219, 218, 227];   // #DBDAE3
-export const PANEL_RIGHT = [204, 204, 215];  // #CCCCD7
+export const PANEL_LEFT = [233, 232, 240];   // #E9E8F0, = --home-bg-left
+export const PANEL_RIGHT = [220, 219, 230];  // #DCDBE6, = --home-bg-right
 
 /* --------------------------------------------------------------------------
    the shading field

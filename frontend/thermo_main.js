@@ -37,6 +37,7 @@ import {
 import { GasRenderer } from "../rendering/gas_renderer.js";
 import { ThermoApparatus } from "../rendering/thermo_apparatus.js";
 import { buildThermoLeftRail, buildThermoRightRail } from "./thermo_ui.js";
+import { mountAxisGizmo } from "./axis_gizmo.js";
 import { THERMO_LABS } from "./thermo_labs.js";
 import { THERMO_INSTRUMENTS } from "./thermo_instruments.js";
 import { createLabCard } from "./ui.js";
@@ -98,10 +99,10 @@ const TRACE_MAX = 800;
    moves, which is the wrong way round. */
 const TRACE_MIN_FRACTION = 0.0015;
 const LID_GRAB_PX = 28;
-/* How long a frame may spend paying back the gas it owes the panel, in ms, and
-   how many steps it commits to between two readings of the clock. Six of a
-   sixteen-millisecond frame is a frame that still draws, and eight steps is
-   about three milliseconds of gas at the box's usual population. */
+/* How long a frame may spend paying back the gas a dragged control owes the
+   panel, in ms, and how many steps it commits to between two readings of the
+   clock. Six of a sixteen-millisecond frame is a frame that still answers, and
+   eight steps is about one millisecond of gas at the box's usual population. */
 const SETTLE_BUDGET_MS = 6;
 const SETTLE_SLICE = 8;
 
@@ -129,6 +130,9 @@ export function bootThermoWorkbench() {
      the physics. Every lab is a state applied to this box. */
   const box = new GasBox({ ...DEFAULT_STATE, maxMolecules: MAX_MOLECULES });
   const renderer = new GasRenderer(canvas, box);
+  /* The stage's orientation triad: the same widget, reading this bench's own
+     camera, so it turns with the box when the gas is orbited. */
+  const axisGizmo = mountAxisGizmo(document.getElementById("thermoViewport"), () => renderer.camera);
   /* The apparatus is a separate layer because it answers to a different thing: the
      renderer's job is to draw the gas where the box says it is, and this one's
      is to draw what someone put on the bench. Both hang off the same root, so
@@ -163,38 +167,59 @@ export function bootThermoWorkbench() {
      nothing behind it has no pressure to report, and nothing to report is not
      the same as reporting nought.
 
-     The steps that fill that window are run in slices from the frame loop rather
-     than in one go wherever they were asked for. Three reasons, all of them the
-     same reason:
+     Those steps are run here and now, before the handler that asked for them
+     returns, and never from the frame loop. They used to be paid back in slices
+     over the following frames, and the gas was drawn between the slices: a box
+     that had just been dealt visibly streamed and swirled while the button said
+     Paused. The bench was measuring itself in full view, and it looked exactly
+     like an experiment that had started without being asked to.
 
-       * a lab's own setup and a page load both re-deal the gas, and running the
-         window inside the click is a click that stops answering;
-       * a slider asks for one on every input event, and a slider that ran a
-         window of gas per pixel dragged would stutter;
-       * the loading of the page itself is one of those clicks, so the same
-         machine that keeps a click cheap is the one that keeps the first paint
-         early - the box is settled while the reader is looking at it rather than
-         before anything has been drawn at all.
+     A window of gas is a few tens of milliseconds of arithmetic - two windows to
+     settle a cold page - which is a price a click can pay without being seen to
+     stall, and it buys the rule the page is supposed to keep: while Paused, the
+     picture is still. The panel is therefore never empty either, so a rate is
+     never printed as the dash it used to show until the slices caught up. */
 
-     The cost is that the window is empty for a few frames, so every readout that
-     is a rate says so instead of printing a zero: the rail reads `window` off
-     the same observation and prints a dash until there is something to divide
-     by. */
+  /** Run this many steps of gas now, then whatever was waiting on them.
+   *
+   * For the places that happen once and behind a curtain: the first gas of a
+   * page load, a lab opening, a session coming back. Nothing is on screen yet
+   * when these run, so a window of gas costs a few tens of milliseconds and
+   * nobody sees it. */
+  function settle(steps, onDone = null) {
+    const n = Math.max(0, Math.round(steps));
+    if (n > 0) advance(n);
+    if (onDone) onDone();
+  }
+
+  /* What a reader's own control owes the box, paid from the frame loop instead.
+     A slider sends an input event per pixel dragged and every one of them
+     re-deals the gas, so a window per event inside the event is a drag that
+     stops answering. The frame loop pays these back in small slices - and holds
+     the picture still until they are paid, so the rule holds everywhere: a
+     bench that is paused is a bench that is not moving. */
   let settleRemaining = 0;
   let settleOnDone = null;
 
-  /**
-   * Owe the box this many more steps.
-   *
-   * Coalesced rather than queued: a slider that asks for a window on every pixel
-   * still only owes one, which is what makes dragging it cost the same as
-   * touching it once.
-   */
-  function settle(steps, onDone = null) {
+  function settleLater(steps, onDone = null) {
     settleRemaining = Math.max(settleRemaining, Math.max(0, Math.round(steps)));
-    /* The latest request owns the finish line: a lab that wants its pinhole
-       opened after the settle beats the lab that asked for it before. */
     if (onDone) settleOnDone = onDone;
+  }
+
+  /** Pay back as much of what the box is owed as one frame can afford. */
+  function paySettle() {
+    if (settleRemaining <= 0) return;
+    const until = performance.now() + SETTLE_BUDGET_MS;
+    do {
+      const chunk = Math.min(SETTLE_SLICE, settleRemaining);
+      advance(chunk);
+      settleRemaining -= chunk;
+    } while (settleRemaining > 0 && performance.now() < until);
+    if (settleRemaining <= 0) {
+      const done = settleOnDone;
+      settleOnDone = null;
+      if (done) done();
+    }
   }
 
   /**
@@ -226,31 +251,6 @@ export function bootThermoWorkbench() {
       if (box.hole === 0) box.setHole(hole, { rewindow: false });
       if (onDone) onDone();
     });
-  }
-
-  /**
-   * Pay the box back in slices, and run whatever was waiting on the settle.
-   *
-   * Sliced by step count rather than by a clock reading per step: a slice is
-   * short enough that the clock is consulted a handful of times a frame, and
-   * long enough that the consultation is not the cost. `advance` is the same
-   * function the frame loop runs the gas with, so a settle is indistinguishable
-   * from the run that would have happened had the reader pressed Run.
-   */
-  function settleSlice() {
-    if (settleRemaining <= 0) return false;
-    const until = performance.now() + SETTLE_BUDGET_MS;
-    do {
-      const chunk = Math.min(SETTLE_SLICE, settleRemaining);
-      advance(chunk);
-      settleRemaining -= chunk;
-    } while (settleRemaining > 0 && performance.now() < until);
-    if (settleRemaining <= 0) {
-      const done = settleOnDone;
-      settleOnDone = null;
-      if (done) done();
-    }
-    return true;
   }
 
   /* ------------------------------- the P-V trace ------------------------------- */
@@ -559,7 +559,7 @@ export function bootThermoWorkbench() {
        pressed Run. That state is the one thing on this page that looks broken
        and is not, and it is owed a window; the frame loop pays it back in slices
        so that dragging the slider that caused it stays smooth. */
-    if (box.windowTime <= 0) settle(warmSteps());
+    if (box.windowTime <= 0) settleLater(warmSteps());
     updateReadouts(true);
     scheduleSessionSave();
   }
@@ -953,6 +953,16 @@ export function bootThermoWorkbench() {
     apparatus.setSelected(null);
     renderer.setSelected(null);
     rightRail.setInstrument(null);
+    /* The timeline is part of the bench, not a property of the gas, so it is not
+       in the box's state and `applyState` cannot put it back. Cleared by hand,
+       before the box is dealt: the resolution is the step length the settle is
+       about to run at, and setting it afterwards would leave the first window
+       measured at the rate the last experiment was using. */
+    box.setPrecision(1);
+    stepsPerFrame = 6;
+    speedRamp = 1;
+    renderer.setSpeedScale(speedRamp);
+    leftRail.syncTimeline({ steps: stepsPerFrame, ramp: speedRamp, resolution: box.precision });
     applyState(DEFAULT_STATE);
     labCard.hide();
     for (const row of labRows.values()) row.classList.remove("on");
@@ -1101,7 +1111,13 @@ export function bootThermoWorkbench() {
     renderer.setViewMode(mode);
     renderer.resize();
     renderer.frame();
+    /* The 2D view is a fixed orthographic look at the box: a triad there would
+       report an orientation the reader cannot change, so it goes away with the
+       orbit. */
+    if (axisGizmo?.element) axisGizmo.element.style.display = mode === "2d" ? "none" : "";
     for (const b of viewToggle.querySelectorAll("button")) b.classList.toggle("on", b.dataset.mode === mode);
+    const hint = document.getElementById("thermoStageHint");
+    if (hint) hint.textContent = mode === "2d" ? "Drag to pan · scroll to zoom" : "Drag to orbit · scroll to zoom";
   }
 
   /* The stage answers a wheel and a pinch already; these two are the same
@@ -1455,9 +1471,11 @@ export function bootThermoWorkbench() {
        owed to the box waits here with it, for the same reason: it is the gas's
        own clock it is spending. */
     if (document.getElementById("thermo")?.hidden) return;
-    /* Whatever was owed to the box, before this frame's run: the gas only moves
-       forward, so the settle is not a different gas, just sooner. */
-    settleSlice();
+    paySettle();
+    /* Mid-settle the box is half a measurement old, and drawing it would show
+       gas in motion on a paused bench - which is precisely the thing the
+       bench is not allowed to do. The frame after the last slice paints it. */
+    if (settleRemaining > 0 && !running) return;
     if (running) {
       const t0 = performance.now();
       advance(stepsPerFrame);
@@ -1557,11 +1575,10 @@ export function bootThermoWorkbench() {
   renderer.setSpeedScale(speedRamp);
   renderer.frame();
   rightRail.fit();
-  /* A refreshed gas, from the frame loop rather than from here: this is the
-     first thing that happens on the page, and running a window of gas inside the
-     page's own load is what used to hold the first paint back by most of a
-     second. The settle is then either extended or replaced by whatever the
-     session or the lab that opens wants; see `settle`. */
+  /* A refreshed gas, settled here and now: the first frame this page paints is
+     one of gas already at its own equilibrium, with the clock stopped and
+     nothing left to pay back. Whatever the session or the lab that follows asks
+     for replaces this settle; see `settle`. */
   settleSealed(warmSteps());
   syncRunButton();
   syncRestartButton();
