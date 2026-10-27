@@ -28,7 +28,7 @@ modules, and the only place that imports `three` is `rendering/`.
 
 ## A word of thanks
 
-This project grew out of the way Prof. C. B. Attaway describes the work of the
+This project grew out of the way Prof. Batty describes the work of the
 computational physics group at the University of Waterloo in his teaching and
 research materials. The idea of building a physics environment as a collection
 of independent, well-tested modules rather than one monolithic engine comes from
@@ -39,7 +39,7 @@ same tradition as his published work on the subject: the surface is a real
 thing, the forces are real numbers, and a student can sit in front of the
 screen and see the theory become a picture.
 
-Thank you to Prof. Attaway for the inspiration, and for making the study of
+Thank you to Prof. Batty for the inspiration, and for making the study of
 computational physics feel like something you could build rather than something
 you could only read about. His pages at
 [https://cs.uwaterloo.ca/~c2batty/](https://cs.uwaterloo.ca/~c2batty/)
